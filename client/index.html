@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Snake</title>
+
+    <meta name="viewport" content="width=device-width, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=9" />
+
+    <!--Import Google Icon Font-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!--Import materialize.css-->
+    <!--<link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection"/>-->
+    <link type="text/css" rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+
+<header class="header">
+    <div class="header-title">
+        Snake
+    </div>
+    <div class="header-login">
+        <span class="header-user">Login</span>
+        <i class="material-icons" id="usermenu-toggle">perm_identity</i>
+    </div>
+</header>
+
+<ul class="sidebar" id="sidebar-menu">
+    <li class="sidebar-element sidebar-active">
+        <a href="#home">
+            <span class="sidebar-icon">
+                <i class="material-icons">home</i>
+            </span>
+            <span class="sidebar-title">Home</span>
+        </a>
+    </li>
+    <li class="sidebar-element">
+        <a href="#game">
+            <span class="sidebar-icon">
+                <i class="material-icons">games</i>
+            </span>
+            <span class="sidebar-title">Game</span>
+        </a>
+    </li>
+    <li class="sidebar-element">
+        <a href="#score">
+            <span class="sidebar-icon">
+                <i class="material-icons">score</i>
+            </span>
+            <span class="sidebar-title">Score</span>
+        </a>
+    </li>
+    <li class="sidebar-element">
+        <a href="#levels">
+            <span class="sidebar-icon">
+                <i class="material-icons">build</i>
+            </span>
+            <span class="sidebar-title">Levels</span>
+        </a>
+    </li>
+    <li class="sidebar-controller" id="sidebar-toggle">
+        <a href="#levels">
+            <span class="sidebar-icon">
+                <i class="material-icons">keyboard_arrow_right</i>
+            </span>
+            <span class="sidebar-title">Close</span>
+        </a>
+    </li>
+</ul>
+
+<div class="usermenu" id="usermenu">
+    <input type="text">
+    <input type="password" />
+    <button>Login</button>
+</div>
+
+<div class="main">
+    <div class="main-overlay"></div>
+    <h1 class="main-title" id="main-title"></h1>
+    <div id="main-content"></div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+
+<script src="js/pageHandler/pageHome.js"></script>
+<script src="js/pageHandler/pageGame.js"></script>
+<script src="js/pageHandler/pageScore.js"></script>
+<script src="js/pageHandler/pageLevels.js"></script>
+<script src="js/pageHandler.js"></script>
+
+<script src="js/content.js"></script>
+<script src="js/client.js"></script>
+</body>
+</html>
