@@ -224,6 +224,18 @@ body {
     text-transform: capitalize;
 }
 
+.keyboard-description {
+    margin-top: 20px;
+    margin-bottom: 20px;
+    height: 60px;
+    width: 100%;
+    padding-right: 500px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;     
+}
+
 /*
 @media screen and (max-height: 450px) {
     .sidebar {
@@ -233,6 +245,8 @@ body {
         font-size: 18px;
     }
 }
-
-
 */
+
+
+/* HOME */
+

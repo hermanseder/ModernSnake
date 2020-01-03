@@ -38,6 +38,18 @@ document.addEventListener('keyup', function(event) {
         case 83: // S
             mov = 'S';
             break;
+        case 37:  //ARROW LEFT
+            mov = 'LEFT';
+            break; 
+        case 38: //ARROW UP
+            mov = 'UP';
+            break; 
+        case 39: //ARROW RIGHT
+            mov = 'RIGHT'; 
+            break; 
+        case 40: //ARROW DOWN
+            mov = 'DOWN'; 
+            break; 
     }
     socket.emit('movement', mov);
 });

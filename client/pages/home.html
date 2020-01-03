@@ -1,20 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Home</title>
 </head>
+
 <body>
-<h3 id="result">Modern Snake</h3>
-<h4> Description:  </h4>
 
-<div>
-    <img src="pics/example.jpg" alt = 'example'>
-</div>
+    <main>
+        <h3 id="result">Modern Snake</h3>
+
+        <h4> Description: </h4>
+        <p>
+            In Modern Snake you control a snake whose task it is to eat fruits. With every bite the snake grows.
+            The aim of the game is to collect as many fruits as possible. Walls on the board make it difficult to
+            collect the fruits.
+            With increasing score you get to a higher level with more walls.
+            The higher the level, the higher the difficulty.
+        </p>
+
+        <h4>Level-Builder: </h4>
+        <p>
+            With the ingame-levelbuilder you can create your own levels.
+            The user can set walls on the game board himself and thus create user-defined levels.
+        </p>
+
+        <h2> Keyboard-Control </h2>
+
+        <div>
+            <img width="100%" src="pics/keyboard-layout.png" alt='keyboard-layout'>
+        </div>
+        <div class="keyboard-description">
+            <ul>
+                <li>W: move Snake up</li>
+                <li>A: move Snake left</li>
+                <li>S: move Snake down</li>
+                <li>D: move Snake right</li>
+            </ul>
+            <ul>
+                <li>Arrow Key Up: move Snake up</li>
+                <li>Arrow Key Left: move Snake left</li>
+                <li>Arrow Key Down: move Snake down</li>
+                <li>Arrow Key Right: move Snake right</li>
+            </ul>
+        </div>
+
+        <h2> Game-Board </h2>
+        <div>
+            <img width="100%" src="pics/example.jpg" alt='example'>
+        </div>
 
 
-<a class="waves-effect waves-light btn" onclick="login()">Login</a>
-<div id="loginState">false</div>
+        <a class="waves-effect waves-light btn" onclick="login()">Login</a>
+        <div id="loginState">false</div>
 
+    </main>
 </body>
+
 </html>
