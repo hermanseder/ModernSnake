@@ -1,0 +1,12 @@
+CRYPTO: https://ciphertrick.com/salt-hash-passwords-using-nodejs-crypto/
+SQLITE: https://www.techonthenet.com/sqlite
+SECURITY: http://ithare.com/client-plus-server-password-hashing-as-a-potential-way-to-improve-security-against-brute-force-attacks-without-overloading-server/
+SINGLETON: https://anasshekhamis.com/2017/07/27/the-singleton-design-pattern-es5-and-es2015/
+CLASS: https://gist.github.com/remarkablemark/fa62af0a2c57f5ef54226cae2258b38d
+
+Librarys:
+ - https://github.com/dxa4481/clientHashing
+ - https://www.npmjs.com/package/bcryptjs
+
+TODOS:
+    - remove requests after timeout

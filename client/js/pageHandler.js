@@ -1,41 +1,48 @@
-class PageHandler {
+const PageHandler = (function () {
+    let _currentClass;
+    let _mainContent;
+    let _mainTitle;
 
-    constructor(mainContent, mainTitle) {
-        this.currentClass = undefined;
-        this.mainContent = mainContent;
-        this.mainTitle = mainTitle;
+    function initialize(mainContent, mainTitle) {
+        _currentClass = undefined;
+        _mainContent = mainContent;
+        _mainTitle = mainTitle;
     }
 
-    updatePath(id) {
+    function updatePath(id) {
         switch (id) {
             case 'home':
-                this.loadPath(id, 'home', new PageHome()).then();
+                _loadPath(id, 'home', PageHome);
                 break;
             case 'game':
-                this.loadPath(id, 'game', new PageGame()).then();
+                _loadPath(id, 'game', PageHome);
                 break;
             case 'score':
-                this.loadPath(id, 'score', new PageScore()).then();
+                _loadPath(id, 'score', PageScore);
                 break;
             case 'levels':
-                this.loadPath(id, 'levels', new PageLevels()).then();
+                _loadPath(id, 'levels', PageLevels);
                 break;
             default:
-                console.error(`Invalid path given: '${id}'`);
+                console.error('Invalid path given: "' + id + '"');
         }
     }
 
-    async loadPath(title, dest, newClass) {
-        if (this.currentClass !== undefined) {
-            this.currentClass.destroy();
+    function _loadPath (title, dest, newClass) {
+        if (_currentClass !== undefined) {
+            _currentClass.destroy();
         }
 
-        await this.mainContent.empty();
-        await this.mainContent.load(`pages/${dest}.html`);
-
-        this.mainTitle.text(title);
-        this.currentClass = newClass;
-        this.currentClass.initialize();
+        _mainContent.empty();
+        _mainContent.load('pages/' + dest + '.html', undefined, function () {
+            _mainTitle.text(title);
+            _currentClass = newClass;
+            _currentClass.initialize();
+        });
     }
 
-}
+    return {
+        initialize: initialize,
+        updatePath: updatePath
+    };
+})();

@@ -14,12 +14,15 @@ app.set('port', config.port);
 app.use('/', express.static(__dirname + config.clientPath));
 
 // Routing
-app.get('/', function(request, response) {
+app.get('/', function (request, response) {
     response.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Start
-server.startServer(httpServer, config.authenticateTimeout, __dirname + config.userCredentialPath);
-httpServer.listen(app.get('port'), function() {
-    console.log('Server started!');
-});
+server.startServerAsync(httpServer, config.authenticateTimeout, __dirname + config.userCredentialPath)
+    .then(() => {
+        httpServer.listen(app.get('port'), function () {
+            console.log(`Server started on port: ${app.get('port')}`);
+        })
+    })
+    .catch(() => console.error('Server could not started!'));

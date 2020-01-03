@@ -5,7 +5,7 @@
     <title>Snake</title>
 
     <meta name="viewport" content="width=device-width, user-scalable=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=9"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -69,21 +69,31 @@
 </ul>
 
 <div class="usermenu" id="usermenu">
-    <input type="text">
-    <input type="password"/>
-    <button>Login</button>
+    <input id="login-username" type="text" value="rudi">
+    <input id="login-password" type="password" value="pw"/>
+    <button id="login-button">Login</button>
 </div>
 
 <div class="main">
     <div class="main-overlay"></div>
     <div class="main-center-wrapper">
-        <h1 class="main-title" id="main-title"></h1>
+        <hl1 class="main-title" id="main-title"></hl1>
         <div id="main-content"></div>
     </div>
 </div>
 
+<script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+
+<script src="js/library/bcrypt.js"></script>
+<script src="js/library/sha256.js"></script>
+
+<script src="js/helper/cryptoHelper.js"></script>
+
+<script src="js/config.js"></script>
+<script src="js/socketCommands.js"></script>
 
 <script src="js/pageHandler/pageHome.js"></script>
 <script src="js/pageHandler/pageGame.js"></script>
@@ -91,7 +101,12 @@
 <script src="js/pageHandler/pageLevels.js"></script>
 <script src="js/pageHandler.js"></script>
 
-<script src="js/content.js"></script>
+<script src="js/handler/socketHandler.js"></script>
+<script src="js/handler/loginHandler.js"></script>
+
+<script src="js/uiHandler/contentHandler.js"></script>
+<script src="js/uiHandler/loginUiHandler.js"></script>
+
 <script src="js/client.js"></script>
 </body>
 </html>

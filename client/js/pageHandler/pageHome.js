@@ -1,9 +1,14 @@
-class PageHome {
-    initialize() {
+let PageHome = (function () {
+    function initialize() {
         console.log('init page home');
     }
 
-    destroy() {
+    function destroy() {
         console.log('destroy page home');
     }
-}
+
+    return {
+        initialize: initialize,
+        destroy: destroy
+    };
+})();

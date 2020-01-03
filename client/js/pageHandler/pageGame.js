@@ -1,9 +1,14 @@
-class PageGame {
-    initialize() {
+let PageGame = (function () {
+    function initialize() {
         console.log('init page game');
     }
 
-    destroy() {
-        console.log('destroy page home');
+    function destroy() {
+        console.log('destroy page game');
     }
-}
+
+    return {
+        initialize: initialize,
+        destroy: destroy
+    };
+})();

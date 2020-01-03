@@ -1,4 +1,16 @@
+/* Declarations */
+// let loginUiHandler;
+
 const socket = io();
+
+$(document).ready(function () {
+    SocketHandler.initialize(socket);
+    LoginHandler.initialize(socket);
+
+    LoginUiHandler.initialize();
+    ContentHandler.initialize();
+});
+
 
 socket.on('authenticated', function() {
     document.getElementById("loginState").innerHTML = true;
