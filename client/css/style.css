@@ -20,9 +20,18 @@
 }
 
 /* NORMALIZE */
+html {
+    margin: 0;
+    padding: 0;
+}
+
 body {
     margin: 0;
     padding: 0;
+}
+
+/* TAGS */
+body {
     background-color: #eff0eb;
 }
 
@@ -254,7 +263,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .main-center-wrapper {
-    max-width: 800px;
+    max-width: 80vw;
     padding: 10px 15px;
     margin: 0 auto;
 }
@@ -265,14 +274,67 @@ h1, h2, h3, h4, h5, h6 {
     text-transform: capitalize;
 }
 
+/* HOME */
+.info-container {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    grid-template-rows: 2;
+    grid-column-gap: 10px;
+}
+
+@media screen and (min-width: 600px) {
+    .info-container {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(1, 1fr);
+    }
+}
+
+.spacer {
+    flex: 1;
+}
+
+#keyboard-description {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
 /* GAME */
 #game-field {
     background-color: #c5c1bb;
+    width: 80%;
+}
+
+/* SCORE */
+.parent-score-box{
     width: 100%;
+    display: grid;
+    margin-bottom: 1rem;
+    grid-column-gap: 10px;
+    grid-row-gap: 10px;
+}
+
+.child-score-box {
+    background-color: #484e4a;
+    color: #eff0eb;
+    padding-left: 1rem;
+    text-align: center;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+@media screen and (min-width: 600px) {
+    .parent-score-box{
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+        grid-auto-flow: dense;
+    }
 }
 
 /* INPUTS */
-
 .error-message {
     height: 30px;
 
@@ -294,47 +356,3 @@ h1, h2, h3, h4, h5, h6 {
     height: 0;
     max-height: 0;
 }
-
-/*button {*/
-/*    border: none;*/
-/*    color: white;*/
-/*    background-color: greenyellow;*/
-/*    display: inline-block;*/
-/*    text-transform: uppercase;*/
-/*    text-decoration: none;*/
-/*    padding: 10px 30px;*/
-/*    border-radius: 3px;*/
-/*    margin:5px;*/
-/*    transition: text-shadow 0.3s ease;*/
-/*    cursor: pointer;*/
-/*    border: none;*/
-/*    outline:none;*/
-/*}*/
-
-/*button:active {*/
-/*    background-color: lightgreen;*/
-/*}*/
-
-/*button:hover {*/
-/*}*/
-
-/*input {*/
-/*    display: inline-block;*/
-/*    color: black;*/
-/*    padding: 10px;*/
-/*    width: 250px;*/
-/*    box-sizing: border-box;*/
-/*    background-color: rgba(0,0,0,0.25);*/
-/*    border: none;*/
-/*    border-radius: 2px;*/
-/*    margin: 5px auto;*/
-/*    transition:background-color 0.5s ease;*/
-/*}*/
-
-/*input:focus {*/
-/*    background-color: rgba(0,0,0,0.45);*/
-/*}*/
-
-/*button {*/
-
-/*}*/
