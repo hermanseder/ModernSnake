@@ -51,8 +51,6 @@ class ServerLoginHandler {
             source: source
         });
 
-        console.log('validation completed');
-        console.log('token: ' + token);
         return token;
     }
 
@@ -81,7 +79,7 @@ class ServerLoginHandler {
 
         let isValid = true;
         isValid = isValid && await databaseHelper.isUsernameValidAsync(username);
-        console.log('username:' + isValid);
+
 
         const password = await databaseHelper.getPasswordAsync(username);
         const salt = this._loginRequests.get(source).salt;

@@ -7,6 +7,8 @@ const databaseHelper = require('./src/helper/databaseHelper');
 const socketCommands = require('./socketCommands');
 
 const serverLoginHandler = require('./src/handler/serverLoginHandler');
+const serverRoomHandler = require('./src/handler/serverRoomHandler');
+const serverGameHandler = require('./src/handler/serverGameHandler');
 
 // Variables
 let ioCommunication;
@@ -18,7 +20,9 @@ async function startServerAsync(server) {
     ioCommunication = socketIO.listen(server);
     _initializeSocket();
     _initializeAuthentication();
-    _initializeHandlers();
+
+    _initializeGames();
+    _initializeRooms();
 }
 
 function stopServer() {
@@ -40,9 +44,54 @@ function _initializeAuthentication(timeout) {
     });
 }
 
-function _initializeHandlers() {
-    console.log('init handler');
+function _initializeHandlers(socket, data) {
+    _initializeHandlersGame(socket);
 }
+
+/* GAME */
+
+function _initializeHandlersGame(socket) {
+    socket.on(socketCommands.getRooms2, (auth, callback) => _getRooms(2, auth, callback));
+    socket.on(socketCommands.getRooms3, (auth, callback) => _getRooms(3, auth, callback));
+    socket.on(socketCommands.getRooms4, (auth, callback) => _getRooms(4, auth, callback));
+
+    socket.on(socketCommands.joinRoom, (auth, name, callback) => _joinRoom(auth, name, socket, callback));
+}
+
+function _getRooms(size, auth, callback) {
+    _checkRequestValid(auth);
+    const result = serverRoomHandler.getRooms(size);
+    console.log(result);
+    callback(result);
+}
+
+function _joinRoom(auth, name, socket, callback) {
+    try {
+        serverRoomHandler.joinRoom(name, socket);
+        // TODO update room list
+        callback(true);
+    } catch (e) {
+        console.log(e);
+        callback(false);
+    }
+}
+
+function _initializeRooms() {
+    serverRoomHandler.initialize(ioCommunication);
+
+    serverRoomHandler.createRoom('room 2', 1, 2, 2);
+    serverRoomHandler.createRoom('room 3', 1, 3, 0);
+    serverRoomHandler.createRoom('room 4', 1, 4, 0);
+
+    const dummyData = {id: 'dummy'};
+    serverRoomHandler.joinRoom('room 2', dummyData);
+}
+
+function _initializeGames() {
+    serverGameHandler.initialize(ioCommunication);
+}
+
+/* HELPER */
 
 function _checkRequestValid(data) {
     let isValid = true;
@@ -66,7 +115,6 @@ module.exports = {
     startServerAsync: startServerAsync,
     stopServer: stopServer
 };
-
 
 
 //

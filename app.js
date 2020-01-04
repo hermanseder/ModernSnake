@@ -25,4 +25,7 @@ server.startServerAsync(httpServer, config.authenticateTimeout, __dirname + conf
             console.log(`Server started on port: ${app.get('port')}`);
         })
     })
-    .catch(() => console.error('Server could not started!'));
+    .catch((e) =>  {
+        console.error(e);
+        console.error('Server could not started!');
+    });

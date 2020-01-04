@@ -11,7 +11,7 @@ const ContentHandler = (function () {
     let mainContent;
 
     /* Init */
-    function initialize() {
+    function initialize(socket) {
         mainTitle = $('#main-title');
         mainContent = $('#main-content');
 
@@ -22,7 +22,7 @@ const ContentHandler = (function () {
         usermenu = $('#usermenu');
         usermenuToggle = $('#usermenu-toggle')
 
-        PageHandler.initialize(mainContent, mainTitle);
+        PageHandler.initialize(socket, mainContent, mainTitle);
 
         initializeSidebar();
         initializeUserMenu();

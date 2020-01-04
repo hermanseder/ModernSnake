@@ -4,6 +4,12 @@ module.exports = {
     loginRequest: 'loginRequest',
     loginSucceeded: 'loginSucceeded',
 
-    movement: 'movement',
+    getRooms2: 'getRooms2',
+    getRooms3: 'getRooms3',
+    getRooms4: 'getRooms4',
+    joinRoom: 'joinRoom',
+
+    gameUpdate: 'gameUpdate',
+    gameMovement: 'gameMovement',
 
 }

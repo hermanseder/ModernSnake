@@ -25,9 +25,6 @@ async function generateDummySaltAsync(username) {
 }
 
 async function compareHashAsync(password, serverSalt, clientHash) {
-    console.log(password);
-    console.log(serverSalt);
-    console.log(clientHash);
     const comparePromise = util.promisify(bcrypt.compare);
     const hash = await generateHashAsync(password, serverSalt);
     return comparePromise.call(bcrypt, hash, clientHash);

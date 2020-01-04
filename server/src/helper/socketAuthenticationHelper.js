@@ -1,6 +1,7 @@
 // Dependencies
 const socketCommands = require('../../socketCommands');
 const serverLoginHandler = require('../handler/ServerLoginHandler');
+const serverRoomHandler = require('../handler/serverRoomHandler');
 
 // External functions
 function authenticate(socket, data, callback) {
@@ -14,6 +15,7 @@ function authenticate(socket, data, callback) {
 }
 
 function disconnect(socket) {
+    serverRoomHandler.leaveRoom(socket.id);
     serverLoginHandler.logoutAsync(socket.username).then().catch();
 }
 
@@ -34,8 +36,6 @@ function _authenticateRequest(socket, socketId, username, callback) {
 function _authenticateLogin(socket, socketId, username, hash, callback) {
     serverLoginHandler.loginAsync(socketId, username, hash)
         .then((token) => {
-            console.log('return');
-            console.log(token);
             socket.username = username;
             callback(null, true);
             socket.emit(socketCommands.loginSucceeded, {token: token});

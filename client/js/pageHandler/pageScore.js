@@ -1,4 +1,10 @@
 let PageScore = (function () {
+    let _ioCommunication;
+
+    function construct(socket) {
+        _ioCommunication = socket;
+    }
+
     function initialize() {
         console.log('init page score');
     }
@@ -12,6 +18,7 @@ let PageScore = (function () {
     }
 
     return {
+        construct: construct,
         initialize: initialize,
         destroy: destroy,
         isAllowed: isAllowed

@@ -3,10 +3,12 @@ const PageHandler = (function () {
     let _mainContent;
     let _mainTitle;
 
-    function initialize(mainContent, mainTitle) {
+    function initialize(socket, mainContent, mainTitle) {
         _currentClass = undefined;
         _mainContent = mainContent;
         _mainTitle = mainTitle;
+
+        _constructPages(socket);
     }
 
     function updatePath(id) {
@@ -27,6 +29,13 @@ const PageHandler = (function () {
                 console.error('Invalid path given: "' + id + '"');
                 return false;
         }
+    }
+
+    function _constructPages(socket) {
+        PageHome.construct(socket);
+        PageGame.construct(socket);
+        PageScore.construct(socket);
+        PageLevels.construct(socket);
     }
 
     function _loadPath (title, dest, newClass) {

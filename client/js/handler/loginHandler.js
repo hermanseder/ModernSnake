@@ -30,6 +30,13 @@ const LoginHandler = (function () {
         return _currentUser !== undefined;
     }
 
+    function getAuth() {
+        return {
+            username: _currentUser,
+            token: _currentToken
+        };
+    }
+
     /* Internal functions */
     function _getPasswordHash(password) {
         return CryptoHelper.generatePasswordHash(password, ModernSnakeConfig.userSalt);
@@ -105,6 +112,7 @@ const LoginHandler = (function () {
     return {
         initialize: initialize,
         login: login,
-        isLoggedIn: isLoggedIn
+        isLoggedIn: isLoggedIn,
+        getAuth: getAuth,
     };
 })();

@@ -246,6 +246,12 @@ body {
 
 */
 
+/* GAME */
+#game-field{
+    border: solid 1px blue;
+    width: 100%;
+}
+
 /* INPUTS */
 
 .error-message {
