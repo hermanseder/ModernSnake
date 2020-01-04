@@ -26,7 +26,8 @@ const LoginHandler = (function () {
     }
 
     function isLoggedIn() {
-        return _currentToken !== undefined;
+        console.log(_currentUser);
+        return _currentUser !== undefined;
     }
 
     /* Internal functions */

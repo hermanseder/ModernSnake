@@ -67,8 +67,9 @@ const ContentHandler = (function () {
         const element = $(link);
         const destination = getMenuEntryDestination(element);
 
-        PageHandler.updatePath(destination);
-        updateSelectedMenu(source);
+        if (PageHandler.updatePath(destination)) {
+            updateSelectedMenu(source);
+        }
     }
 
     function updateSelectedMenu(source) {
@@ -107,11 +108,11 @@ const ContentHandler = (function () {
         if (_isUsermenuOpen()) {
             closeUsermenu();
         } else {
-            _openSideBar();
+            openUsermenu();
         }
     }
 
-    function _openSideBar() {
+    function openUsermenu() {
         if (!_isUsermenuOpen()) {
             closeSidebar();
             usermenu.addClass('usermenu-open');
@@ -132,6 +133,7 @@ const ContentHandler = (function () {
     /* Exports */
     return {
         initialize: initialize,
-        closeUsermenu: closeUsermenu
+        closeUsermenu: closeUsermenu,
+        openUsermenu: openUsermenu,
     };
 })();

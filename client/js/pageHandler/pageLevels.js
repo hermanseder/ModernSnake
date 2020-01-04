@@ -7,8 +7,13 @@ let PageLevels = (function () {
         console.log('destroy page levels');
     }
 
+    function isAllowed() {
+        return LoginHandler.isLoggedIn();
+    }
+
     return {
         initialize: initialize,
-        destroy: destroy
+        destroy: destroy,
+        isAllowed: isAllowed
     };
 })();

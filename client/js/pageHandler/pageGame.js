@@ -7,8 +7,13 @@ let PageGame = (function () {
         console.log('destroy page game');
     }
 
+    function isAllowed() {
+        return LoginHandler.isLoggedIn();
+    }
+
     return {
         initialize: initialize,
-        destroy: destroy
+        destroy: destroy,
+        isAllowed: isAllowed
     };
 })();

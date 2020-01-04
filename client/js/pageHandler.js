@@ -12,23 +12,29 @@ const PageHandler = (function () {
     function updatePath(id) {
         switch (id) {
             case 'home':
-                _loadPath(id, 'home', PageHome);
+                return _loadPath(id, 'home', PageHome);
                 break;
             case 'game':
-                _loadPath(id, 'game', PageHome);
+                return _loadPath(id, 'game', PageGame);
                 break;
             case 'score':
-                _loadPath(id, 'score', PageScore);
+                return _loadPath(id, 'score', PageScore);
                 break;
             case 'levels':
-                _loadPath(id, 'levels', PageLevels);
+                return _loadPath(id, 'levels', PageLevels);
                 break;
             default:
                 console.error('Invalid path given: "' + id + '"');
+                return false;
         }
     }
 
     function _loadPath (title, dest, newClass) {
+        if (!newClass.isAllowed()) {
+            ContentHandler.openUsermenu();
+            return false;
+        }
+
         if (_currentClass !== undefined) {
             _currentClass.destroy();
         }
@@ -39,6 +45,8 @@ const PageHandler = (function () {
             _currentClass = newClass;
             _currentClass.initialize();
         });
+
+        return true;
     }
 
     return {

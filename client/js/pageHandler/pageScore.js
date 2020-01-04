@@ -7,8 +7,13 @@ let PageScore = (function () {
         console.log('destroy page score');
     }
 
+    function isAllowed() {
+        return LoginHandler.isLoggedIn();
+    }
+
     return {
         initialize: initialize,
-        destroy: destroy
+        destroy: destroy,
+        isAllowed: isAllowed
     };
 })();

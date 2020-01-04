@@ -7,8 +7,13 @@ let PageHome = (function () {
         console.log('destroy page home');
     }
 
+    function isAllowed() {
+        return true;
+    }
+
     return {
         initialize: initialize,
-        destroy: destroy
+        destroy: destroy,
+        isAllowed: isAllowed
     };
 })();
