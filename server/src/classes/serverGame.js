@@ -54,6 +54,7 @@ _interval: number;
 _speedDegree: integer;
 
 _snakeMoveTime: number;
+_appleAliveTime: number;
 
 _gameLoopRunning: boolean;
 
@@ -82,6 +83,7 @@ class ServerGame {
         this._phase = 0;
         this._interval = config.gameInterval;
         this._snakeMoveTime = 0;
+        this._appleAliveTime = 0;
 
         this._buildInitialGameData(config.gameDimensions, config.gameStartSize,
             config.gameBeforeTime, config.gameAfterTime);
@@ -205,122 +207,139 @@ class ServerGame {
             this._moveSnake();
             this._snakeMoveTime = 0;
         }
+
+        this._appleAliveTime -= delta;
+        if (this._appleAliveTime <= 0) {
+            this._updateApple();
+        }
     }
 
     _moveSnake() {
-        let appleUsedBy = undefined;
+        const newPositions = this._getNewSnakePositions();
+        if (newPositions.size <= 0) {
+            this._phase = 2;
+            return;
+        }
+
+        const invalidUsers = this._validateSnakePositions(newPositions, this._getInvalidPositions());
+        this._disableInvalidUsers(invalidUsers);
+        this._updateApplesAndSnakeLength(newPositions);
+        this._mergeNewPositions(newPositions);
+    }
+
+    _updateApple() {
+        this._gameData.game.apple = undefined;
+        while (this._gameData.game.apple === undefined) {
+            const x = Math.round(Math.random() * this._gameData.dimension);
+            const y = Math.round(Math.random() * this._gameData.dimension);
+            const invalidPositions = this._getInvalidPositions();
+            let valid = true;
+            for (const position of invalidPositions) {
+                if (position.x !== x) continue;
+                if (position.y !== y) continue;
+                valid = false;
+                break;
+            }
+            if (valid) {
+                this._gameData.game.apple = {x: x, y: y};
+            }
+        }
+
+        this._appleAliveTime = (config.gameAppleBaseDuration * (1 + Math.random()));
+    }
+
+    _updateApplesAndSnakeLength(newPositions) {
+        const apple = this._gameData.game.apple;
         for (const entry of this._gameData.game.snakes) {
             if (!entry.alive) continue;
+            if (!newPositions.has(entry.username)) continue;
 
-            this._updateSnakePosition(entry);
-            if (this._checkApple(entry.snake[0].x, entry.snake[0].y)) {
-                appleUsedBy = entry.username;
+            const position = newPositions.get(entry.username);
+            if (apple !== undefined && apple.x === position.x && apple.y === position.y) {
                 entry.score++;
+                this._gameData.game.apple = undefined;
             } else {
                 entry.snake.pop();
             }
         }
-        const looser = this._validateSnakes(appleUsedBy);
-        this._fixScore(looser, appleUsedBy);
-
-        const anyPlayerAlive = this._removeLooser(looser);
-        if (!anyPlayerAlive) {
-            this._phase = 2;
-        }
     }
 
-    _validateSnakes() {
-        const looser = [];
-        for (const snake1 of this._gameData.game.snakes) {
-            if (!snake1.alive) continue;
+    _getInvalidPositions() {
+        let invalidPositions = this._gameData.game.walls;
+        for (const entry of this._gameData.game.snakes) {
+            invalidPositions = [...invalidPositions, ...entry.snake];
+        }
+        return invalidPositions;
+    }
 
-            for (const snake2 of this._gameData.game.snakes) {
-                if (snake1.username === snake2.username) continue;
-
-                for (let i = 0; i < snake2.snake.length; i++) {
-                    if (snake1.snake[0].x !== snake2.snake[i].x) continue;
-                    if (snake1.snake[0].y !== snake2.snake[i].y) continue;
-
-                    looser.push(snake1.username);
-                    if (i <= 0) {
-                        looser.push(snake2.username);
-                    }
-                }
+    _validateSnakePositions(snakePositions, invalidPositions) {
+        const invalidUsers = [];
+        for (const [username, position] of snakePositions) {
+            for (const invalidPosition of invalidPositions) {
+                if (position.x !== invalidPosition.x) continue;
+                if (position.y !== invalidPosition.y) continue;
+                invalidUsers.push(username);
             }
         }
-        return looser;
+        return invalidUsers;
     }
 
-    _fixScore(looser, appleUsedBy) {
-        if (appleUsedBy !== undefined && looser.indexOf(appleUsedBy) >= -1) {
-            for (const entry of this._gameData.game.snakes) {
-                if (entry.username === appleUsedBy) {
-                    entry.score--;
+    _disableInvalidUsers(invalidUsers) {
+        if (invalidUsers.length <= 0) return;
+        for (const snake of this._gameData.game.snakes) {
+            if (invalidUsers.indexOf(snake.username) >= 0) {
+                snake.alive = false;
+            }
+        }
+    }
+
+    _mergeNewPositions(newPositions) {
+        for (const entry of this._gameData.game.snakes) {
+            if (!entry.alive) continue;
+            entry.snake.unshift(newPositions.get(entry.username));
+        }
+    }
+
+    _getNewSnakePositions() {
+        const newSnakePositions = new Map();
+        for (const entry of this._gameData.game.snakes) {
+            if (!entry.alive) continue;
+            switch (entry.direction) {
+                case  config.directionUp: {
+                    const newPosition = entry.snake[0].y - 1;
+                    newSnakePositions.set(entry.username, {
+                        x: entry.snake[0].x,
+                        y: newPosition < 0 ? (this._gameData.dimension - 1) : newPosition
+                    });
+                    break;
+                }
+                case  config.directionDown: {
+                    const newPosition = entry.snake[0].y + 1;
+                    newSnakePositions.set(entry.username, {
+                        x: entry.snake[0].x,
+                        y: newPosition > (this._gameData.dimension - 1) ? 0 : newPosition
+                    });
+                    break;
+                }
+                case  config.directionRight: {
+                    const newPosition = entry.snake[0].x + 1;
+                    newSnakePositions.set(entry.username, {
+                        x: newPosition > (this._gameData.dimension - 1) ? 0 : newPosition,
+                        y: entry.snake[0].y
+                    });
+                    break;
+                }
+                case config.directionLeft: {
+                    const newPosition = entry.snake[0].x - 1;
+                    newSnakePositions.set(entry.username, {
+                        x: newPosition < 0 ? (this._gameData.dimension - 1) : newPosition,
+                        y: entry.snake[0].y
+                    });
                     break;
                 }
             }
         }
-    }
-
-    _removeLooser(looser) {
-        let anyPlayerAlive = false;
-        for (const entry of this._gameData.game.snakes) {
-            if (looser.indexOf(entry.username) >= 0) {
-                entry.alive = false;
-                this._gameData.after.result.unshift(entry.username);
-            }
-            anyPlayerAlive = anyPlayerAlive || entry.alive;
-        }
-        return anyPlayerAlive;
-    }
-
-    _updateSnakePosition(entry) {
-        switch (entry.direction) {
-            case  config.directionUp: {
-                const newPosition = entry.snake[0].y - 1;
-                entry.snake.unshift({
-                    x: entry.snake[0].x,
-                    y: newPosition < 0 ? (this._gameData.dimension - 1) : newPosition
-                });
-                break;
-            }
-            case  config.directionDown: {
-                const newPosition = entry.snake[0].y + 1;
-                entry.snake.unshift({
-                    x: entry.snake[0].x,
-                    y: newPosition > (this._gameData.dimension - 1) ? 0 : newPosition
-                });
-                break;
-            }
-            case  config.directionRight: {
-                const newPosition = entry.snake[0].x + 1;
-                entry.snake.unshift({
-                    x: newPosition > (this._gameData.dimension - 1) ? 0 : newPosition,
-                    y: entry.snake[0].y
-                });
-                break;
-            }
-            case config.directionLeft: {
-                const newPosition = entry.snake[0].x - 1;
-                entry.snake.unshift({
-                    x: newPosition < 0 ? (this._gameData.dimension - 1) : newPosition,
-                    y: entry.snake[0].y
-                });
-                break;
-            }
-        }
-    }
-
-    _checkApple(positionX, positionY) {
-        const apple = this._gameData.game.apple;
-
-        if (apple === undefined) return false;
-        if (apple.x !== positionX) return false;
-        if (apple.y !== positionY) return false;
-
-        this._gameData.game.apple = undefined;
-
-        return true;
+        return newSnakePositions;
     }
 
     _sendUpdateToUsers() {

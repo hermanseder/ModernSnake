@@ -91,7 +91,7 @@ let GameUiHandler = (function () {
         for (let i = 0; i < gameData.game.snakes.length; i++) {
             _drawGameSnake(segmentSize, gameData.game.snakes[i], _getSnakeColor(i));
         }
-        _drawGameApple();
+        _drawGameApple(segmentSize, gameData.game.apple);
 
         if (!gameData.running) {
 
@@ -108,6 +108,19 @@ let GameUiHandler = (function () {
         for (const wall of wallData) {
             _drawContext.fillRect(wall.x * segmentSize, wall.y * segmentSize, segmentSize, segmentSize);
         }
+    }
+
+    function _drawGameApple(segmentSize, appleData) {
+        if (appleData === undefined) return;
+
+        const offset = segmentSize / 2;
+        const positionX = offset + (segmentSize * (appleData.x));
+        const positionY = offset + (segmentSize * (appleData.y));
+
+        _drawContext.fillStyle = _appleColor;
+        _drawContext.beginPath();
+        _drawContext.arc(positionX, positionY, (segmentSize / 2), 0, 2 * Math.PI);
+        _drawContext.fill();
     }
 
     function _drawGameSnake(segmentSize, snakeData, color) {
@@ -135,10 +148,6 @@ let GameUiHandler = (function () {
             default:
                 return '#ffffff';
         }
-    }
-
-    function _drawGameApple(appleData) {
-
     }
 
     return {
