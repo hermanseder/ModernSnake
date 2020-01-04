@@ -9,10 +9,10 @@ module.exports = {
     jsonWebTokenExpirationInSeconds: 10800, // 2 hours
 
     gameInterval: 1000 / 10,
-    gameDimensions: 50,
+    gameDimensions: 40,
     gameBeforeTime: 3000,
     gameAfterTime: 5000,
-    gameStartSize: 3,
+    gameStartSize: 10,
     gameSnakeSpeed0: 1000 / 4,
     gameSnakeSpeed1: 1000 / 8,
     gameSnakeSpeed2: 1000 / 16,

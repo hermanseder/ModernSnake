@@ -8,7 +8,9 @@ _gameData: {
         snakes: [
             {
                 username: string,
-                direction: string, // 'up' | 'down' | 'left' | 'right'
+                direction: string, // 'up' | 'down' | 'left' | 'right',
+                score: integer,
+                alive: boolean
                 snake: [
                     {
                         x: integer,
@@ -29,7 +31,8 @@ _gameData: {
         ]
     },
     before?: {
-        countdown: number
+        countdown: number,
+        result: [string]
     }
     after?: {
         remainingTime: number
@@ -52,10 +55,13 @@ _speedDegree: integer;
 
 _snakeMoveTime: number;
 
+_gameLoopRunning: boolean;
+
  */
 
 const config = require('../../serverConfig.js');
 const socketCommands = require('../../socketCommands');
+const requestHelper = require('../helper/requestHelper');
 const {interval} = require('rxjs');
 const {take} = require('rxjs/operators');
 
@@ -68,6 +74,7 @@ class ServerGame {
         this._players = players;
         this._speedDegree = speedDegree;
         this._gameEndCallback = gameEndCallback;
+        this._gameLoopRunning = false;
     }
 
     startGame() {
@@ -75,6 +82,7 @@ class ServerGame {
         this._phase = 0;
         this._interval = config.gameInterval;
         this._snakeMoveTime = 0;
+
         this._buildInitialGameData(config.gameDimensions, config.gameStartSize,
             config.gameBeforeTime, config.gameAfterTime);
 
@@ -85,14 +93,17 @@ class ServerGame {
     _addPlayerListener() {
         for (const player of this._players.values()) {
             if (!player.socket.username) continue;
-            player.socket.on(socketCommands.gameMovement,
-                (auth, direction) => this._movePlayer(player.username, direction));
+            player.socket.on(socketCommands.gameMovement, (auth, direction) => {
+                if (requestHelper.checkRequestValid(auth)) {
+                    this._movePlayer(player.username, direction);
+                }
+            });
         }
     }
 
     _movePlayer(username, direction) {
-        // TODO auth
-        console.log('move ' + direction);
+        if (!this._gameData.running) return;
+
         const currentDirection = this._getCurrentDirection(username);
         if (currentDirection === undefined) return;
 
@@ -136,8 +147,21 @@ class ServerGame {
     }
 
     _startGameLoop() {
+        console.log('start game loop');
         // TODO USE BETTER ONE
-        interval(this._interval).subscribe((round) => this._updateGame(this._interval));
+        this._gameLoopRunning = true;
+        const loopSubscription = interval(this._interval)
+            .subscribe((round) => {
+                if (this._gameLoopRunning) {
+                    this._updateGame(this._interval);
+                } else {
+                    loopSubscription.unsubscribe();
+                }
+            });
+    }
+
+    _stopGameLoop() {
+        this._gameLoopRunning = false;
     }
 
     _updateGame(delta) {
@@ -167,6 +191,14 @@ class ServerGame {
         }
     }
 
+    _updatePhaseEnd(delta) {
+        this._gameData.after.countdown -= delta;
+        if (this._gameData.after.countdown <= 0) {
+            this._gameEndCallback(this._id);
+            this._stopGameLoop();
+        }
+    }
+
     _updatePhaseGame(delta) {
         this._snakeMoveTime += delta;
         if (this._snakeMoveTime >= this._gameData.snakeSpeed) {
@@ -176,47 +208,119 @@ class ServerGame {
     }
 
     _moveSnake() {
+        let appleUsedBy = undefined;
         for (const entry of this._gameData.game.snakes) {
-            switch (entry.direction) {
-                case  config.directionUp: {
-                    const newPosition = entry.snake[0].y - 1;
-                    entry.snake.unshift({
-                        x: entry.snake[0].x,
-                        y: newPosition < 0 ? (this._gameData.dimension - 1) : newPosition
-                    });
-                    break;
-                }
-                case  config.directionDown: {
-                    const newPosition = entry.snake[0].y + 1;
-                    entry.snake.unshift({
-                        x: entry.snake[0].x,
-                        y: newPosition > (this._gameData.dimension - 1) ? 0 : newPosition
-                    });
-                    break;
-                }
-                case  config.directionRight: {
-                    const newPosition = entry.snake[0].x + 1;
-                    entry.snake.unshift({
-                        x: newPosition > (this._gameData.dimension - 1) ? 0 : newPosition,
-                        y: entry.snake[0].y
-                    });
-                    break;
-                }
-                case  config.directionLeft: {
-                    const newPosition = entry.snake[0].x - 1;
-                    entry.snake.unshift({
-                        x: newPosition < 0 ? (this._gameData.dimension - 1) : newPosition,
-                        y: entry.snake[0].y
-                    });
-                    break;
-                }
+            if (!entry.alive) continue;
+
+            this._updateSnakePosition(entry);
+            if (this._checkApple(entry.snake[0].x, entry.snake[0].y)) {
+                appleUsedBy = entry.username;
+                entry.score++;
+            } else {
+                entry.snake.pop();
             }
-            entry.snake.pop();
+        }
+        const looser = this._validateSnakes(appleUsedBy);
+        this._fixScore(looser, appleUsedBy);
+
+        const anyPlayerAlive = this._removeLooser(looser);
+        if (!anyPlayerAlive) {
+            this._phase = 2;
         }
     }
 
-    _updatePhaseEnd(delta) {
+    _validateSnakes() {
+        const looser = [];
+        for (const snake1 of this._gameData.game.snakes) {
+            if (!snake1.alive) continue;
 
+            for (const snake2 of this._gameData.game.snakes) {
+                if (snake1.username === snake2.username) continue;
+
+                for (let i = 0; i < snake2.snake.length; i++) {
+                    if (snake1.snake[0].x !== snake2.snake[i].x) continue;
+                    if (snake1.snake[0].y !== snake2.snake[i].y) continue;
+
+                    looser.push(snake1.username);
+                    if (i <= 0) {
+                        looser.push(snake2.username);
+                    }
+                }
+            }
+        }
+        return looser;
+    }
+
+    _fixScore(looser, appleUsedBy) {
+        if (appleUsedBy !== undefined && looser.indexOf(appleUsedBy) >= -1) {
+            for (const entry of this._gameData.game.snakes) {
+                if (entry.username === appleUsedBy) {
+                    entry.score--;
+                    break;
+                }
+            }
+        }
+    }
+
+    _removeLooser(looser) {
+        let anyPlayerAlive = false;
+        for (const entry of this._gameData.game.snakes) {
+            if (looser.indexOf(entry.username) >= 0) {
+                entry.alive = false;
+                this._gameData.after.result.unshift(entry.username);
+            }
+            anyPlayerAlive = anyPlayerAlive || entry.alive;
+        }
+        return anyPlayerAlive;
+    }
+
+    _updateSnakePosition(entry) {
+        switch (entry.direction) {
+            case  config.directionUp: {
+                const newPosition = entry.snake[0].y - 1;
+                entry.snake.unshift({
+                    x: entry.snake[0].x,
+                    y: newPosition < 0 ? (this._gameData.dimension - 1) : newPosition
+                });
+                break;
+            }
+            case  config.directionDown: {
+                const newPosition = entry.snake[0].y + 1;
+                entry.snake.unshift({
+                    x: entry.snake[0].x,
+                    y: newPosition > (this._gameData.dimension - 1) ? 0 : newPosition
+                });
+                break;
+            }
+            case  config.directionRight: {
+                const newPosition = entry.snake[0].x + 1;
+                entry.snake.unshift({
+                    x: newPosition > (this._gameData.dimension - 1) ? 0 : newPosition,
+                    y: entry.snake[0].y
+                });
+                break;
+            }
+            case config.directionLeft: {
+                const newPosition = entry.snake[0].x - 1;
+                entry.snake.unshift({
+                    x: newPosition < 0 ? (this._gameData.dimension - 1) : newPosition,
+                    y: entry.snake[0].y
+                });
+                break;
+            }
+        }
+    }
+
+    _checkApple(positionX, positionY) {
+        const apple = this._gameData.game.apple;
+
+        if (apple === undefined) return false;
+        if (apple.x !== positionX) return false;
+        if (apple.y !== positionY) return false;
+
+        this._gameData.game.apple = undefined;
+
+        return true;
     }
 
     _sendUpdateToUsers() {
@@ -237,7 +341,8 @@ class ServerGame {
                 countdown: beforeTime
             },
             after: {
-                countdown: afterTime
+                countdown: afterTime,
+                result: []
             },
         }
     }
@@ -249,6 +354,8 @@ class ServerGame {
         for (let i = 0; i < userNames.length; i++) {
             result.push({
                 username: userNames[i],
+                score: 0,
+                alive: true,
                 direction: this._getSnakeDirectionBeginning(i),
                 snake: this._getSnakeBeginning(dimensions, i, startSize)
             });
@@ -301,7 +408,16 @@ class ServerGame {
 
     _getLevelWalls() {
         // TODO load from database
-        return [];
+        return [
+            {x: 2, y: 2},
+            {x: 2, y: 3},
+            {x: 2, y: 4},
+            {x: 3, y: 4},
+            {x: 4, y: 4},
+            {x: 5, y: 4},
+            {x: 6, y: 4},
+            {x: 7, y: 4},
+        ];
     }
 }
 

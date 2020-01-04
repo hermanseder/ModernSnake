@@ -5,6 +5,7 @@ const socketAuthenticationHelper = require('./src/helper/socketAuthenticationHel
 const serverCryptoHelper = require('./src/helper/serverCryptoHelper');
 const databaseHelper = require('./src/helper/databaseHelper');
 const socketCommands = require('./socketCommands');
+const requestHelper = require('./src/helper/requestHelper');
 
 const serverLoginHandler = require('./src/handler/serverLoginHandler');
 const serverRoomHandler = require('./src/handler/serverRoomHandler');
@@ -59,14 +60,16 @@ function _initializeHandlersGame(socket) {
 }
 
 function _getRooms(size, auth, callback) {
-    _checkRequestValid(auth);
-    const result = serverRoomHandler.getRooms(size);
-    console.log(result);
+    let result = [];
+    if (requestHelper.checkRequestValid(auth)) {
+        const result = serverRoomHandler.getRooms(size);
+    }
     callback(result);
 }
 
 function _joinRoom(auth, name, socket, callback) {
     try {
+        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUTH_INVALID');
         serverRoomHandler.joinRoom(name, socket);
         // TODO update room list
         callback(true);
@@ -92,23 +95,6 @@ function _initializeGames() {
 }
 
 /* HELPER */
-
-function _checkRequestValid(data) {
-    let isValid = true;
-
-    isValid = isValid && data !== undefined;
-    isValid = isValid && data.username !== undefined;
-    isValid = isValid && data.token !== undefined;
-
-    if (isValid) {
-        isValid = isValid && serverCryptoHelper.isRequestTokenValidAsync(data.token, data.username);
-    }
-
-    if (!isValid) {
-        console.log('not valid');
-    }
-}
-
 
 // Exports
 module.exports = {

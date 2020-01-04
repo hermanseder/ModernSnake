@@ -4,8 +4,13 @@ _directionUpdateCallback: function(direction): void;
 
 let GameUiHandler = (function () {
     /* Constants */
-    const _backgroundColor = '#4d4d4d';
-    const _snakeColor = '#6c8e9d';
+    const _backgroundColor = '#7d7d7d';
+    const _snakeColor1 = '#406b9d';
+    const _snakeColor2 = '#d0aa00';
+    const _snakeColor3 = '#7c4fd0';
+    const _snakeColor4 = '#2ed007';
+    const _appleColor = '#ff0000';
+    const _wallColor = '#4d3e3a';
 
     /* Variables */
     let _drawContext;
@@ -82,9 +87,9 @@ let GameUiHandler = (function () {
         const segmentSize = currentSize / gameData.dimension;
 
         _drawGameBorder(currentSize, gameData.dimension, segmentSize);
-        _drawGameWalls();
-        for (const entry of gameData.game.snakes) {
-            _drawGameSnake(gameData.dimension, segmentSize, entry);
+        _drawGameWalls(segmentSize, gameData.game.walls);
+        for (let i = 0; i < gameData.game.snakes.length; i++) {
+            _drawGameSnake(segmentSize, gameData.game.snakes[i], _getSnakeColor(i));
         }
         _drawGameApple();
 
@@ -98,19 +103,37 @@ let GameUiHandler = (function () {
         _drawContext.fillRect(0, 0, fieldSize, fieldSize);
     }
 
-    function _drawGameWalls(wallData) {
-
+    function _drawGameWalls(segmentSize, wallData) {
+        _drawContext.fillStyle = _wallColor;
+        for (const wall of wallData) {
+            _drawContext.fillRect(wall.x * segmentSize, wall.y * segmentSize, segmentSize, segmentSize);
+        }
     }
 
-    function _drawGameSnake(dimension, segmentSize, snakeData) {
+    function _drawGameSnake(segmentSize, snakeData, color) {
+        _drawContext.fillStyle = color;
         const offset = segmentSize / 2;
         for (const segment of snakeData.snake) {
             const positionX = offset + (segmentSize * (segment.x));
             const positionY = offset + (segmentSize * (segment.y));
-            _drawContext.fillStyle = _snakeColor;
             _drawContext.beginPath();
             _drawContext.arc(positionX, positionY, (segmentSize / 2), 0, 2 * Math.PI);
             _drawContext.fill();
+        }
+    }
+
+    function _getSnakeColor(index) {
+        switch (index) {
+            case 0:
+                return _snakeColor1;
+            case 1:
+                return _snakeColor2;
+            case 2:
+                return _snakeColor3;
+            case 3:
+                return _snakeColor4;
+            default:
+                return '#ffffff';
         }
     }
 

@@ -249,6 +249,7 @@ body {
 /* GAME */
 #game-field{
     border: solid 1px blue;
+    background-color: #7d7d7d;
     width: 100%;
 }
 
