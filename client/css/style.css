@@ -259,24 +259,11 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 auto;
 }
 
-.main-title {
-    margin: 0;
+#main-title {
+    margin: 10px 0 20px 0;
     padding: 0;
     text-transform: capitalize;
 }
-
-/*
-@media screen and (max-height: 450px) {
-    .sidebar {
-        padding-top: 15px;
-    }
-    .sidebar a {
-        font-size: 18px;
-    }
-}
-
-
-*/
 
 /* GAME */
 #game-field {

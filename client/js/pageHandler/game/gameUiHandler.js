@@ -5,12 +5,12 @@ _directionUpdateCallback: function(direction): void;
 let GameUiHandler = (function () {
     /* Constants */
     const _backgroundColor = '#c5c1bb';
-    const _snakeColor1 = '#406b9d';
-    const _snakeColor2 = '#d0aa00';
-    const _snakeColor3 = '#7c4fd0';
-    const _snakeColor4 = '#2ed007';
-    const _appleColor = '#ff0000';
-    const _wallColor = '#4d3e3a';
+    const _snakeColor1 = '#ee6e73';
+    const _snakeColor2 = '#eacb48';
+    const _snakeColor3 = '#26a69a';
+    const _snakeColor4 = '#4caf50';
+    const _appleColor = '#f44336';
+    const _wallColor = '#5e4c46';
 
     /* Variables */
     let _drawContext;
