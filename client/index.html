@@ -10,7 +10,8 @@
     <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!--Import materialize.css-->
-    <!--<link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection"/>-->
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css" media="screen,projection"/>
+
     <link type="text/css" rel="stylesheet" href="css/style.css"/>
 </head>
 <body>
@@ -19,9 +20,9 @@
     <div class="header-title">
         Snake
     </div>
-    <div class="header-login">
-        <span class="header-user">Login</span>
-        <i class="material-icons" id="usermenu-toggle">perm_identity</i>
+    <div class="header-login" id="usermenu-toggle">
+        <span class="header-user" id="current-user">Login</span>
+        <i class="material-icons">perm_identity</i>
     </div>
 </header>
 
@@ -69,23 +70,41 @@
 </ul>
 
 <div class="usermenu" id="usermenu">
-    <input id="login-username" type="text" value="rudi">
-    <input id="login-password" type="password" value="pw"/>
-    <button id="login-button">Login</button>
+    <h3>Login</h3>
+    <div class="row">
+        <div class="input-field col s12">
+            <input id="login-username" type="text" class="validate" minlength="1">
+            <label for="login-username">Username</label>
+        </div>
+        <div class="input-field col s12">
+            <input id="login-password" type="password" class="validate" minlength="1">
+            <label for="login-password">Password</label>
+        </div>
+        <div class="input-field col s12">
+            <a id="login-button" class="waves-effect waves-light btn">Login</a>
+        </div>
+        <div class="input-field col s12">
+            <div id="login-message" class="error-message error-message-hidden">Login incorrect</div>
+        </div>
+    </div>
 </div>
 
 <div class="main">
-    <div class="main-overlay"></div>
     <div class="main-center-wrapper">
         <hl1 class="main-title" id="main-title"></hl1>
         <div id="main-content"></div>
     </div>
 </div>
 
+<div class="usermenu-overlay"></div>
+
+<!-- Scripts -->
+
 <script src="https://cdn.polyfill.io/v2/polyfill.min.js"></script>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
+<script src="js/library/materialize.min.js"></script>
 
 <script src="js/library/bcrypt.js"></script>
 <script src="js/library/sha256.js"></script>

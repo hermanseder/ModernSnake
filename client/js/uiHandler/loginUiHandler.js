@@ -3,12 +3,18 @@ let LoginUiHandler = (function () {
     let _loginUsername;
     let _loginPassword;
     let _loginButton;
+    let _loginMessage;
+    let _currentUser;
 
     /* External functions */
     function initialize() {
         _loginUsername = $('#login-username');
         _loginPassword = $('#login-password');
         _loginButton = $('#login-button');
+        _loginMessage = $('#login-message');
+        _currentUser = $('#current-user');
+
+        _updateLoginEnabled();
 
         _initializeClickEvents();
         _initializeKeyEvents();
@@ -17,6 +23,15 @@ let LoginUiHandler = (function () {
     function clearLogin() {
         _loginUsername.val('');
         _loginPassword.val('');
+        _removeErrorMessage();
+    }
+
+    function showError() {
+        _loginMessage.removeClass('error-message-hidden');
+    }
+
+    function updateCurrentUser(username) {
+        _currentUser.text(username || 'Login');
     }
 
     /* Internal functions */
@@ -32,6 +47,7 @@ let LoginUiHandler = (function () {
     function _loginButtonClicked() {
         if (_loginEnabled()) {
             console.log('perform login');
+            _removeErrorMessage();
             LoginHandler.login(_loginUsername.val(), _loginPassword.val());
         } else {
             console.log('login not available');
@@ -53,10 +69,16 @@ let LoginUiHandler = (function () {
         return true;
     }
 
+    function _removeErrorMessage() {
+        _loginMessage.addClass('error-message-hidden');
+    }
+
     /* Exports */
     return {
         initialize: initialize,
-        clearLogin: clearLogin
+        clearLogin: clearLogin,
+        showError: showError,
+        updateCurrentUser: updateCurrentUser,
     };
 
 })();

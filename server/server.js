@@ -4,6 +4,7 @@ const socketAuth = require('socketio-auth');
 const socketAuthenticationHelper = require('./src/helper/socketAuthenticationHelper');
 const serverCryptoHelper = require('./src/helper/serverCryptoHelper');
 const databaseHelper = require('./src/helper/databaseHelper');
+const socketCommands = require('./socketCommands');
 
 const serverLoginHandler = require('./src/handler/serverLoginHandler');
 
@@ -40,7 +41,7 @@ function _initializeAuthentication(timeout) {
 }
 
 function _initializeHandlers() {
-
+    console.log('init handler');
 }
 
 function _checkRequestValid(data) {

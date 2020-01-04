@@ -2,8 +2,7 @@
 _loginRequests: [
     source: {
         username: string,
-        salt: string,
-        remainingRetries: int,
+        salt: string
     }
 ]
 
@@ -26,17 +25,18 @@ class ServerLoginHandler {
     }
 
     async requestLoginAsync(source, username) {
-        if (this._hasLoginRequest(source)) throw new Error('ALREADY_REQUESTED');
+        if (this._hasLoggedIn(username)) throw new Error('ALREADY_LOGGED_IN');
+        if (this._hasLoginRequest(source)){
+            this._removeRequest(source);
+        }
 
         const userExists = await databaseHelper.isUsernameValidAsync(username);
         const serverSalt = userExists ? await serverCryptoHelper.generateSaltAsync() :
             await serverCryptoHelper.generateDummySaltAsync(username);
 
-        const maximumRetries = config.maximumPasswordRetries;
         this._loginRequests.set(source, {
             username: username,
-            salt: serverSalt,
-            remainingRetries: maximumRetries
+            salt: serverSalt
         });
 
         return serverSalt;
@@ -88,7 +88,7 @@ class ServerLoginHandler {
         isValid = isValid && await serverCryptoHelper.compareHashAsync(password, salt, hash);
 
         if (!isValid) {
-            this._reduceRemainingRetries(source);
+            this._removeRequest(source);
             throw new Error('INVALID_PASSWORD');
         }
     }
@@ -99,15 +99,6 @@ class ServerLoginHandler {
 
     _hasLoginRequest(source) {
         return this._loginRequests.has(source);
-    }
-
-    _reduceRemainingRetries(source) {
-        if (this._hasLoginRequest(source)) {
-            this._loginRequests.get(source).remainingRetries--;
-            if (this._loginRequests.get(source).remainingRetries <= 0) {
-                this._removeRequest(source);
-            }
-        }
     }
 
     _removeRequest(source) {

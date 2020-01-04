@@ -37,21 +37,21 @@ const ContentHandler = (function () {
     }
 
     function sidebarToggleClick() {
-        if (sidebar.width() <= 60) {
-            sidebar.addClass('sidebar-open');
-        } else {
+        if (_isSidebarOpen()) {
             sidebar.removeClass('sidebar-open');
+        } else {
+            sidebar.addClass('sidebar-open');
         }
     }
 
     function closeSidebar() {
-        if (sidebar.width() > 60) {
+        if (_isSidebarOpen()) {
             sidebar.removeClass('sidebar-open');
         }
     }
 
     function openSidebar() {
-        if (sidebar.width() >= 60) {
+        if (!_isSidebarOpen()) {
             sidebar.addClass('sidebar-open');
         }
     }
@@ -93,6 +93,10 @@ const ContentHandler = (function () {
         return destination;
     }
 
+    function _isSidebarOpen() {
+        return sidebar.hasClass('sidebar-open');
+    }
+
     /* USERMENU */
 
     function initializeUserMenu() {
@@ -100,17 +104,34 @@ const ContentHandler = (function () {
     }
 
     function usermenuToggleClick() {
-        if (usermenu.width() <= 10) {
+        if (_isUsermenuOpen()) {
+            closeUsermenu();
+        } else {
+            _openSideBar();
+        }
+    }
+
+    function _openSideBar() {
+        if (!_isUsermenuOpen()) {
             closeSidebar();
             usermenu.addClass('usermenu-open');
-        } else {
+        }
+    }
+
+    function closeUsermenu() {
+        if (_isUsermenuOpen()) {
             usermenu.removeClass('usermenu-open');
             openSidebar();
         }
     }
 
+    function _isUsermenuOpen() {
+        return usermenu.hasClass('usermenu-open');
+    }
+
     /* Exports */
     return {
-        initialize: initialize
+        initialize: initialize,
+        closeUsermenu: closeUsermenu
     };
 })();
