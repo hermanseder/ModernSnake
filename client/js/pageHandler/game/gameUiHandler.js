@@ -4,7 +4,7 @@ _directionUpdateCallback: function(direction): void;
 
 let GameUiHandler = (function () {
     /* Constants */
-    const _backgroundColor = '#7d7d7d';
+    const _backgroundColor = '#c5c1bb';
     const _snakeColor1 = '#406b9d';
     const _snakeColor2 = '#d0aa00';
     const _snakeColor3 = '#7c4fd0';

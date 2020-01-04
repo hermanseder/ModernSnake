@@ -3,6 +3,7 @@ SQLITE: https://www.techonthenet.com/sqlite
 SECURITY: http://ithare.com/client-plus-server-password-hashing-as-a-potential-way-to-improve-security-against-brute-force-attacks-without-overloading-server/
 SINGLETON: https://anasshekhamis.com/2017/07/27/the-singleton-design-pattern-es5-and-es2015/
 CLASS: https://gist.github.com/remarkablemark/fa62af0a2c57f5ef54226cae2258b38d
+COLORS: https://lz12v4f1p8c1cumxnbiqvm10-wpengine.netdna-ssl.com/wp-content/uploads/2019/10/bitchin-kitchen-color-palette-2020-1.jpg
 
 Librarys:
  - https://github.com/dxa4481/clientHashing
