@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>One Player</title>
+</head>
+<body>
+
+<div id="room-selection-container">
+    room select
+</div>
+
+<div id="level-selection-handler">
+    <div class="row">
+        <div class="input-field col s12 m4">
+            <select id="select-game-difficulty">
+            </select>
+            <label>Difficulty</label>
+        </div>
+        <div class="input-field col s12 m4">
+            <select id="select-game-level">
+            </select>
+            <label>Level</label>
+        </div>
+        <div id="game-start-container" class="input-field col s12 m4">
+            <a id="game-start" class="waves-effect waves-light btn-small full-width-button" disabled="true">
+                Start
+            </a>
+        </div>
+        <div id="room-name-container" class="input-field col s12 m4">
+            <input id="room-name" type="text" class="validate" minlength="3">
+            <label for="room-name">Room name</label>
+        </div>
+    </div>
+    <div id="room-create-container" class="row">
+        <div class="input-field col s12 m4 offset-m4">
+            <a id="room-create" class="waves-effect waves-light btn-small full-width-button">
+                Create
+            </a>
+        </div>
+    </div>
+</div>
+
+<div id="playground-container">
+</div>
+</body>
+</html>

@@ -21,16 +21,18 @@ class ServerRoomHandler {
         this._ioCommunication = socket;
     }
 
-    createRoom(name, level, countPlayers, speedDegree) {
-        console.log(name);
-        console.log(this._rooms.has(name));
+    createRoom(name, level, countPlayers, difficulty) {
+        const speedDegree = this._getSpeedDegree(difficulty);
+
         if (this.hasRoom(name)) throw new Error('NAME_ALREADY_USED');
         this._rooms.set(name, new ServerRoom(this._ioCommunication, name, level,
             countPlayers, speedDegree, this._roomEndCallback.bind(this)));
     }
 
-    removeRoom(name) {
+    closeRoom(name) {
         if (this.hasRoom(name)) {
+            const room = this._rooms.get(name);
+            room.closeRoom();
             this._rooms.delete(name);
         }
     }
@@ -45,8 +47,11 @@ class ServerRoomHandler {
     }
 
     leaveRoom(sourceId) {
-        for (const room of this._rooms.values()) {
+        for (const [name, room] of this._rooms) {
             room.leaveRoom(sourceId);
+            if (room.roomEmptyAndGameStarted()) {
+                this.closeRoom(name);
+            }
         }
     }
 
@@ -69,10 +74,20 @@ class ServerRoomHandler {
 
     _roomEndCallback(name) {
         if (this._rooms.has(name)) {
-            // Recreate room
-            const roomData = this._rooms.get(name);
-            this._rooms.delete(name);
-            this.createRoom(name, roomData.getLevel(), roomData.getCountPlayers());
+            this.closeRoom(name);
+        }
+    }
+
+    _getSpeedDegree(difficulty) {
+        switch (difficulty) {
+            case 0:
+                return config.gameSnakeSpeed0;
+            case 1:
+                return config.gameSnakeSpeed1;
+            case 2:
+                return config.gameSnakeSpeed2;
+            default:
+                throw new Error('INVALID_DIFFICULTY');
         }
     }
 }

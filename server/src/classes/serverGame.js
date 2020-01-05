@@ -9,6 +9,7 @@ _gameData: {
             {
                 username: string,
                 direction: string, // 'up' | 'down' | 'left' | 'right',
+                directionRequest: string, // 'up' | 'down' | 'left' | 'right',
                 score: integer,
                 alive: boolean
                 snake: [
@@ -31,11 +32,11 @@ _gameData: {
         ]
     },
     before?: {
-        countdown: number,
-        result: [string]
+        countdown: number
     }
     after?: {
-        remainingTime: number
+        remainingTime: number,
+        result: [string]
     }
 }
 
@@ -92,9 +93,24 @@ class ServerGame {
         this._startGameLoop();
     }
 
+    playerLeave(socketId) {
+        for (const [name, player] of this._players) {
+            if (name === socketId) {
+                player.socket.removeAllListeners(socketCommands.gameMovement);
+            }
+        }
+    }
+
+    stopGame() {
+        this._gameLoopRunning = false;
+        this._gameData = undefined;
+        for (const player of this._players.values()) {
+            player.socket.removeAllListeners(socketCommands.gameMovement);
+        }
+    }
+
     _addPlayerListener() {
         for (const player of this._players.values()) {
-            if (!player.socket.username) continue;
             player.socket.on(socketCommands.gameMovement, (auth, direction) => {
                 if (requestHelper.checkRequestValid(auth)) {
                     this._movePlayer(player.username, direction);
@@ -105,6 +121,7 @@ class ServerGame {
 
     _movePlayer(username, direction) {
         if (!this._gameData.running) return;
+        if (this._hasDirectionRequest(username)) return;
 
         const currentDirection = this._getCurrentDirection(username);
         if (currentDirection === undefined) return;
@@ -133,7 +150,7 @@ class ServerGame {
     _updateSnakeDirection(username, direction) {
         for (const snake of this._gameData.game.snakes) {
             if (snake.username === username) {
-                snake.direction = direction;
+                snake.directionRequest = direction;
                 break;
             }
         }
@@ -148,8 +165,16 @@ class ServerGame {
         return undefined;
     }
 
+    _hasDirectionRequest(username) {
+        for (const snake of this._gameData.game.snakes) {
+            if (snake.username === username) {
+                return snake.directionRequest !== undefined;
+            }
+        }
+        return false;
+    }
+
     _startGameLoop() {
-        console.log('start game loop');
         // TODO USE BETTER ONE
         this._gameLoopRunning = true;
         const loopSubscription = interval(this._interval)
@@ -196,6 +221,8 @@ class ServerGame {
     _updatePhaseEnd(delta) {
         this._gameData.after.countdown -= delta;
         if (this._gameData.after.countdown <= 0) {
+            this._gameData.after.countdown = 0;
+            this._sendUpdateToUsers();
             this._gameEndCallback(this._id);
             this._stopGameLoop();
         }
@@ -204,6 +231,7 @@ class ServerGame {
     _updatePhaseGame(delta) {
         this._snakeMoveTime += delta;
         if (this._snakeMoveTime >= this._gameData.snakeSpeed) {
+            this._setNewDirections();
             this._moveSnake();
             this._snakeMoveTime = 0;
         }
@@ -211,6 +239,14 @@ class ServerGame {
         this._appleAliveTime -= delta;
         if (this._appleAliveTime <= 0) {
             this._updateApple();
+        }
+    }
+
+    _setNewDirections() {
+        for (const snake of this._gameData.game.snakes) {
+            if (snake.directionRequest === undefined) return;
+            snake.direction = snake.directionRequest;
+            snake.directionRequest = undefined;
         }
     }
 
@@ -222,9 +258,16 @@ class ServerGame {
         }
 
         const invalidUsers = this._validateSnakePositions(newPositions, this._getInvalidPositions());
+        this._updateResult(invalidUsers);
         this._disableInvalidUsers(invalidUsers);
         this._updateApplesAndSnakeLength(newPositions);
         this._mergeNewPositions(newPositions);
+    }
+
+    _updateResult(invalidUsers) {
+        for (const user of invalidUsers) {
+            this._gameData.after.result.unshift(user);
+        }
     }
 
     _updateApple() {
@@ -343,13 +386,14 @@ class ServerGame {
     }
 
     _sendUpdateToUsers() {
+        // console.log('emit');
         this._ioCommunication.to(this._id).emit(socketCommands.gameUpdate, this._gameData);
     }
 
     _buildInitialGameData(dimensions, startSize, beforeTime, afterTime) {
         this._gameData = {
             dimension: dimensions,
-            snakeSpeed: this._getSnakeSpeed(),
+            snakeSpeed: this._speedDegree,
             running: false,
             game: {
                 snakes: this._buildInitialSnakes(dimensions, startSize),
@@ -376,6 +420,7 @@ class ServerGame {
                 score: 0,
                 alive: true,
                 direction: this._getSnakeDirectionBeginning(i),
+                directionRequest: undefined,
                 snake: this._getSnakeBeginning(dimensions, i, startSize)
             });
         }
@@ -409,19 +454,6 @@ class ServerGame {
                 return config.directionRight;
             case 3:
                 return config.directionLeft;
-        }
-    }
-
-    _getSnakeSpeed() {
-        switch (this._speedDegree) {
-            case 0:
-                return config.gameSnakeSpeed0;
-            case 1:
-                return config.gameSnakeSpeed1;
-            case 2:
-                return config.gameSnakeSpeed2;
-            default:
-                return 1000;
         }
     }
 

@@ -4,6 +4,7 @@ ModernSnakeConfig = {
 
     minimumUsernameLength: 1,
     minimumPasswordLength: 1,
+    minimumRoomLength: 3,
 };
 
 ModernSnakeMessages = {
@@ -27,6 +28,13 @@ ModernSnakeGameDirections = {
     directionDown: 'down',
     directionLeft: 'left',
     directionRight: 'right',
+}
+
+ModernSnakeGameModes = {
+    onePlayer: 1,
+    twoPlayer: 2,
+    threePlayer: 3,
+    fourPlayer: 4,
 }
 
 

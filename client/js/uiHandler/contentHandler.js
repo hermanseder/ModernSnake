@@ -65,7 +65,7 @@ const ContentHandler = (function () {
         if (link.length <= 0) return;
 
         const element = $(link);
-        const destination = getMenuEntryDestination(element);
+        const destination = GenericUiHandler.getHrefDestination(element);
 
         if (PageHandler.updatePath(destination)) {
             updateSelectedMenu(source);
@@ -81,17 +81,6 @@ const ContentHandler = (function () {
                 }
             }
         );
-    }
-
-    function getMenuEntryDestination(source) {
-        if (!source) return '';
-        if (!source.attr('href')) return '';
-
-        const href = source.attr('href');
-        if (!href) return '';
-
-        const destination = href.replace('#', '');
-        return destination;
     }
 
     function _isSidebarOpen() {

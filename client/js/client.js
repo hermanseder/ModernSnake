@@ -9,5 +9,5 @@ $(document).on('ready', function () {
     ContentHandler.initialize(socket);
 
     // TODO REMOVE
-    LoginHandler.login('rudi', 'pw');
+    // LoginHandler.login('rudi', 'pw');
 });

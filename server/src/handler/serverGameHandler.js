@@ -31,6 +31,15 @@ class ServerGameHandler {
             endCallback: gameDoneCallback
         });
         game.startGame();
+        return game;
+    }
+
+    stopGame(id) {
+        if (this._games.has(id)) {
+            this._games.get(id).gameInstance.stopGame();
+            delete this._games.get(id);
+            this._games.delete(id);
+        }
     }
 
     _gameEndCallback(id) {

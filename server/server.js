@@ -1,6 +1,7 @@
 // Dependencies
 const socketIO = require('socket.io');
 const socketAuth = require('socketio-auth');
+const config = require('./serverConfig');
 const socketAuthenticationHelper = require('./src/helper/socketAuthenticationHelper');
 const serverCryptoHelper = require('./src/helper/serverCryptoHelper');
 const databaseHelper = require('./src/helper/databaseHelper');
@@ -52,6 +53,12 @@ function _initializeHandlers(socket, data) {
 /* GAME */
 
 function _initializeHandlersGame(socket) {
+    socket.on(socketCommands.getDifficulty, _getDifficulty);
+    socket.on(socketCommands.getLevels, _getLevels);
+
+    socket.on(socketCommands.startSinglePlayer, ((auth, difficulty, level, callback) =>
+        _startSinglePlayer(auth, socket, difficulty, level, callback)));
+    socket.on(socketCommands.leaveRoom, (auth) => _leaveRoom(auth, socket.id));
     socket.on(socketCommands.getRooms2, (auth, callback) => _getRooms(2, auth, callback));
     socket.on(socketCommands.getRooms3, (auth, callback) => _getRooms(3, auth, callback));
     socket.on(socketCommands.getRooms4, (auth, callback) => _getRooms(4, auth, callback));
@@ -59,12 +66,64 @@ function _initializeHandlersGame(socket) {
     socket.on(socketCommands.joinRoom, (auth, name, callback) => _joinRoom(auth, name, socket, callback));
 }
 
-function _getRooms(size, auth, callback) {
-    let result = [];
-    if (requestHelper.checkRequestValid(auth)) {
-        const result = serverRoomHandler.getRooms(size);
+function _getDifficulty(auth, callback) {
+    try {
+        let result = [];
+        if (requestHelper.checkRequestValid(auth)) {
+            result = config.gameDifficulty;
+        }
+        callback(result);
+    } catch (e) {
+        if (callback) callback([]);
+        console.log(e);
     }
-    callback(result);
+}
+
+function _getLevels(auth, callback) {
+    try {
+        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
+
+        databaseHelper.getLevelsAsync()
+            .then((result) => callback(result))
+            .catch(() => callback([]));
+    } catch (e) {
+        if (callback) callback([]);
+        console.log(e);
+    }
+}
+
+function _startSinglePlayer(auth, socket, difficulty, level, callback) {
+    try {
+        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
+        serverRoomHandler.createRoom(socket.id, level, 1, Number(difficulty));
+        serverRoomHandler.joinRoom(socket.id, socket);
+        callback(true);
+    } catch (e) {
+        if (callback) callback(false);
+        console.log(e);
+    }
+}
+
+function _leaveRoom(auth, socketId) {
+    try {
+        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
+        serverRoomHandler.leaveRoom(socketId);
+    } catch (e) {
+        console.log(e);
+    }
+}
+
+function _getRooms(size, auth, callback) {
+    try {
+        let result = [];
+        if (requestHelper.checkRequestValid(auth)) {
+            const result = serverRoomHandler.getRooms(size);
+        }
+        callback(result);
+    } catch (e) {
+        if (callback) callback([]);
+        console.log(e);
+    }
 }
 
 function _joinRoom(auth, name, socket, callback) {
@@ -75,19 +134,19 @@ function _joinRoom(auth, name, socket, callback) {
         callback(true);
     } catch (e) {
         console.log(e);
-        callback(false);
+        if (callback) callback(false);
     }
 }
 
 function _initializeRooms() {
     serverRoomHandler.initialize(ioCommunication);
 
-    serverRoomHandler.createRoom('room 2', 1, 2, 2);
-    serverRoomHandler.createRoom('room 3', 1, 3, 0);
-    serverRoomHandler.createRoom('room 4', 1, 4, 0);
-
-    const dummyData = {id: 'dummy'};
-    serverRoomHandler.joinRoom('room 2', dummyData);
+    // serverRoomHandler.createRoom('room 2', 1, 2, 2);
+    // serverRoomHandler.createRoom('room 3', 1, 3, 0);
+    // serverRoomHandler.createRoom('room 4', 1, 4, 0);
+    //
+    // const dummyData = {id: 'dummy'};
+    // serverRoomHandler.joinRoom('room 2', dummyData);
 }
 
 function _initializeGames() {

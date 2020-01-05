@@ -80,12 +80,15 @@ const LoginHandler = (function () {
         ContentHandler.closeUsermenu();
         _loginEnd();
         console.log('current token: ' + _currentToken);
+
+        // TODO REMOVE
+        // PageHandler.updatePath('game');
     }
 
     function _loginEnd() {
-        _socketCommunication.off(socketCommands.unauthorized);
-        _socketCommunication.off(socketCommands.loginRequest);
-        _socketCommunication.off(socketCommands.loginSucceeded);
+        _socketCommunication.removeAllListeners(socketCommands.unauthorized);
+        _socketCommunication.removeAllListeners(socketCommands.loginRequest);
+        _socketCommunication.removeAllListeners(socketCommands.loginSucceeded);
     }
 
     function _loginFailed(message) {

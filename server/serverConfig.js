@@ -14,9 +14,10 @@ module.exports = {
     gameBeforeTime: 3000,
     gameAfterTime: 5000,
     gameStartSize: 10,
+    gameDifficulty: [0, 1, 2],
     gameSnakeSpeed0: 1000 / 4,
     gameSnakeSpeed1: 1000 / 8,
-    gameSnakeSpeed2: 1000 / 16,
+    gameSnakeSpeed2: 1000 / 10,
 
     directionUp: 'up',
     directionDown: 'down',

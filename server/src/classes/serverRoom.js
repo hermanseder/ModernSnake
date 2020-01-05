@@ -73,8 +73,18 @@ class ServerRoom {
     leaveRoom(socketId) {
         if (this._currentPlayers.has(socketId)) {
             if (this._currentPlayers.get(socketId).socket.username) this._currentPlayers.get(socketId).socket.leave(this._name);
+            this._currentGame.playerLeave(socketId);
             this._currentPlayers.delete(socketId);
         }
+    }
+
+    roomEmptyAndGameStarted() {
+        return (this._currentPlayers.size <= 0 && this._currentGame !== undefined);
+    }
+
+    closeRoom() {
+        serverGameHandler.stopGame(this._name);
+        this._currentGame = undefined;
     }
 
     _startGame() {

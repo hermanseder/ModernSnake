@@ -55,6 +55,11 @@ async function getPasswordAsync(username) {
     }
 }
 
+async function getLevelsAsync() {
+    // TODO implement
+    return ['default level'];
+}
+
 // Internal functions
 function _databaseExists() {
     try {
@@ -116,4 +121,5 @@ module.exports = {
     destroy: destroy,
     isUsernameValidAsync: isUsernameValidAsync,
     getPasswordAsync: getPasswordAsync,
+    getLevelsAsync: getLevelsAsync,
 }
