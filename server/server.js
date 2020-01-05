@@ -117,7 +117,7 @@ function _getRooms(size, auth, callback) {
     try {
         let result = [];
         if (requestHelper.checkRequestValid(auth)) {
-            const result = serverRoomHandler.getRooms(size);
+            result = serverRoomHandler.getRooms(size);
         }
         callback(result);
     } catch (e) {
@@ -141,9 +141,11 @@ function _joinRoom(auth, name, socket, callback) {
 function _initializeRooms() {
     serverRoomHandler.initialize(ioCommunication);
 
-    // serverRoomHandler.createRoom('room 2', 1, 2, 2);
-    // serverRoomHandler.createRoom('room 3', 1, 3, 0);
-    // serverRoomHandler.createRoom('room 4', 1, 4, 0);
+    serverRoomHandler.createRoom('room 2 easy', 1, 2, 0);
+    serverRoomHandler.createRoom('room 2 normal', 1, 2, 1);
+    serverRoomHandler.createRoom('room 2 hard', 1, 2, 2);
+    serverRoomHandler.createRoom('room 3', 1, 3, 0);
+    serverRoomHandler.createRoom('room 4', 1, 4, 0);
     //
     // const dummyData = {id: 'dummy'};
     // serverRoomHandler.joinRoom('room 2', dummyData);

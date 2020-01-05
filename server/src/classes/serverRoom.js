@@ -35,12 +35,12 @@ class ServerRoom {
         this._roomEndCallback = roomEndCallback;
     }
 
-    getLevel() {
-        return this._level;
+    getDifficulty() {
+        return this._speedDegree;
     }
 
-    getCountPlayers() {
-        return this._countPlayers;
+    getLevel() {
+        return this._level;
     }
 
     getSize() {

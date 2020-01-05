@@ -32,7 +32,7 @@ let PageGame = (function () {
 
     function destroy() {
         console.log('destroy page game');
-        GamePlaygroundHandler.stop();
+        GamePlaygroundHandler.stopGame();
     }
 
     function isAllowed() {

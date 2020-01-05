@@ -21,6 +21,11 @@ ModernSnakeKeyCodes = {
     keyRight1: 68,
     keyDown1: 83,
     keyLeft1: 65,
+
+    swipeUp: 'up',
+    swipeRight: 'right',
+    swipeDown: 'down',
+    swipeLeft: 'left',
 };
 
 ModernSnakeGameDirections = {

@@ -66,7 +66,9 @@ class ServerRoomHandler {
             result.push({
                 name: source,
                 size: room.getSize(),
-                remainingPlaces: room.getRemainingPlaces()
+                remainingPlaces: room.getRemainingPlaces(),
+                level: room.getLevel(),
+                difficulty: room.getDifficulty(),
             });
         }
         return result;

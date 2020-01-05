@@ -309,7 +309,8 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
     color: #484e4a;
 }
-.generic-tab > a::after  {
+
+.generic-tab > a::after {
     position: absolute;
     left: 0;
     bottom: 0;
@@ -360,8 +361,47 @@ h1, h2, h3, h4, h5, h6 {
     margin: 0 auto;
 }
 
+@media screen and (max-width: 600px) {
+    #game-field {
+        width: 100%;
+    }
+}
+
 .full-width-button {
     width: 100%;
+}
+
+#room-selection-container {
+    margin-top: 30px;
+}
+
+.room-selection-row {
+    padding: 10px 5px;
+    border-radius: 3px;
+
+    cursor: pointer;
+
+    background-color: #c5c1bb;
+    color: #484e4a;
+
+    transition: transform 150ms ease-in-out, background-color 150ms ease-in-out, color 150ms ease-in-out;
+}
+
+.room-selection-active,
+.room-selection-row:hover {
+    transform: scale(1.02);
+    background-color: #7e8883;
+    color: #eff0eb;
+}
+
+.room-header {
+    font-weight: 600;
+}
+
+@media screen and (max-width: 600px) {
+    .room-selection-header {
+        display: none;
+    }
 }
 
 /* SCORE */

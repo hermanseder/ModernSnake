@@ -9,6 +9,7 @@ let GameModeSelectorHandler = (function () {
     const _classContainerHidden = 'container-hidden';
     const _playgroundPath = 'pages/game/gamePlayground.html';
     const _selectedOption = 'option:selected';
+    const _roomSelectedClass = 'room-selection-active';
 
     /* Variables */
     let _ioCommunication;
@@ -26,6 +27,8 @@ let GameModeSelectorHandler = (function () {
     let _roomNameInput;
     let _roomCreateContainer;
     let _roomCreateButton;
+
+    let _currentRooms;
 
     /* External functions */
     function construct(socket) {
@@ -137,6 +140,8 @@ let GameModeSelectorHandler = (function () {
     function _initializeMultiPlayer() {
         _currentModeMultiPlayer = true;
 
+        _loadAvailableRooms();
+
         _removeModeListener();
         _initializeModeListener();
         _roomCreateButton.on('click', _createRoom);
@@ -168,6 +173,73 @@ let GameModeSelectorHandler = (function () {
     function _checkStartOrCreateValid() {
         let element = _currentModeMultiPlayer ? _roomCreateButton : _gameStartButton;
         element.attr('disabled', !_isInputValid());
+    }
+
+    function _loadAvailableRooms() {
+        console.log('load ');
+        let command = undefined;
+        console.log(_currentMode);
+        switch (_currentMode) {
+            case ModernSnakeGameModes.twoPlayer:
+                command = socketCommands.getRooms2;
+                break;
+            case ModernSnakeGameModes.threePlayer:
+                command = socketCommands.getRooms3;
+                break;
+            case ModernSnakeGameModes.fourPlayer:
+                command = socketCommands.getRooms4;
+                break;
+        }
+        if (command !== undefined) {
+            console.log('load rooms');
+            _ioCommunication.emit(command, LoginHandler.getAuth(), _fillRooms);
+        }
+    }
+
+    function _fillRooms(rooms) {
+        _roomSelectionContainer.empty();
+        _roomSelectionContainer.append(_createRoomHeader());
+        for (let i = 0; i < rooms.length; i++) {
+            _roomSelectionContainer.append(_createRoomRow(rooms[i]));
+        }
+        _updateRooms();
+    }
+
+    function _updateRooms() {
+        _currentRooms = _roomSelectionContainer.find('.room-selection-row');
+        _currentRooms.on('click', _roomSelected);
+    }
+
+    function _roomSelected(source) {
+        _currentRooms.each(function () {
+                if ($(this).length > 0 && source.delegateTarget === $(this)[0]) {
+                    $(this).addClass(_roomSelectedClass);
+                } else {
+                    $(this).removeClass(_roomSelectedClass);
+                }
+            }
+        );
+        console.log('room selected');
+    }
+
+    function _createRoomHeader() {
+        let element = '<div class="room-selection-header row">';
+        element += '<div class="room-header col s6 m4">Name</div>';
+        element += '<div class="room-header col s6 m3">Level</div>';
+        element += '<div class="room-header col s6 m3">Difficulty</div>';
+        element += '<div class="room-header col s6 m1">Places</div>';
+        element += '</div>';
+        return element;
+    }
+
+    function _createRoomRow(roomData) {
+        let element = '<div class="room-selection-row row">';
+        element += '<div class="room-name col s12 m4">' + roomData.name + '</div>';
+        element += '<div class="room-level col s12 m3">' + roomData.level + '</div>';
+        element += '<div class="room-difficulty col s8 m3">Difficulty ' + roomData.difficulty + '</div>';
+        element += '<div class="room-size col s4 m1">' + (roomData.size - roomData.remainingPlaces) + ' | ' + roomData.size + '</div>';
+        element += '</div>';
+        return element;
     }
 
     function _getLevel() {

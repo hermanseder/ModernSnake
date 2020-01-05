@@ -50,7 +50,15 @@ let GamePlaygroundHandler = (function () {
     function _addListener() {
         $(window).on('resize', _resizeCanvas);
         $(window).on('keyup', _keyboardEvent);
-        console.log('add game listender');
+        // $(window).on('swipeleft', _swipeLeft);
+
+        $('body').bind('touchmove', function(e){e.preventDefault()})
+        $(_gameFieldCanvas).swipe({
+            swipe: function (event, direction, distance, duration, fingerCount, fingerData) {
+                _swipeEvent(direction);
+            }
+        });
+
         _ioCommunication.on(socketCommands.gameUpdate, _gameUpdate);
     }
 
@@ -64,7 +72,7 @@ let GamePlaygroundHandler = (function () {
         if (gameData === undefined) return;
 
         _checkAfter(gameData.after);
-        console.log(gameData);
+        // console.log(gameData);
         _drawGame(gameData);
     }
 
@@ -72,7 +80,7 @@ let GamePlaygroundHandler = (function () {
         if (afterData === undefined) return;
 
         const remainingTime = afterData.countdown;
-        if (remainingTime === undefined ||remainingTime <= 0) {
+        if (remainingTime === undefined || remainingTime <= 0) {
             stopGame();
             _currentEndCallback();
         }
@@ -106,6 +114,27 @@ let GamePlaygroundHandler = (function () {
                 break;
             case ModernSnakeKeyCodes.arrowLeft:
             case ModernSnakeKeyCodes.keyLeft1:
+                direction = ModernSnakeGameDirections.directionLeft;
+                break;
+        }
+        if (direction !== undefined) {
+            _directionUpdate(direction);
+        }
+    }
+
+    function _swipeEvent(event) {
+        let direction = undefined;
+        switch (event) {
+            case ModernSnakeKeyCodes.swipeUp:
+                direction = ModernSnakeGameDirections.directionUp;
+                break;
+            case ModernSnakeKeyCodes.swipeRight:
+                direction = ModernSnakeGameDirections.directionRight;
+                break;
+            case ModernSnakeKeyCodes.swipeDown:
+                direction = ModernSnakeGameDirections.directionDown;
+                break;
+            case ModernSnakeKeyCodes.swipeLeft:
                 direction = ModernSnakeGameDirections.directionLeft;
                 break;
         }
