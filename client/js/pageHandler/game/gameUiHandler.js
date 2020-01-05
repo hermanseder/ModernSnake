@@ -105,8 +105,8 @@ let GameUiHandler = (function () {
 
     function _drawGameWalls(segmentSize, wallData) {
         _drawContext.fillStyle = _wallColor;
-        for (const wall of wallData) {
-            _drawContext.fillRect(wall.x * segmentSize, wall.y * segmentSize, segmentSize, segmentSize);
+        for (let i  = 0; i < wallData.length; i++) {
+            _drawContext.fillRect(wallData[i].x * segmentSize, wallData[i].y * segmentSize, segmentSize, segmentSize);
         }
     }
 
@@ -126,7 +126,8 @@ let GameUiHandler = (function () {
     function _drawGameSnake(segmentSize, snakeData, color) {
         _drawContext.fillStyle = color;
         const offset = segmentSize / 2;
-        for (const segment of snakeData.snake) {
+        for (let i = 0; i < snakeData.snake.length; i++) {
+            const segment = snakeData.snake[i];
             const positionX = offset + (segmentSize * (segment.x));
             const positionY = offset + (segmentSize * (segment.y));
             _drawContext.beginPath();

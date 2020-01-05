@@ -49,10 +49,12 @@ const PageHandler = (function () {
         }
 
         _mainContent.empty();
+        // _mainContent.hide();
         _mainContent.load('pages/' + dest + '.html', undefined, function () {
             _mainTitle.text(title);
             _currentClass = newClass;
             _currentClass.initialize();
+            // _mainContent.fadeIn('fast');
         });
 
         return true;

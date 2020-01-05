@@ -10,6 +10,4 @@ $(document).on('ready', function () {
 
     // TODO REMOVE
     LoginHandler.login('rudi', 'pw');
-
-    socket.emit('test', 'client');
 });
