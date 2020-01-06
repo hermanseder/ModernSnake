@@ -18,9 +18,7 @@ _speedDegree: integer;
 
  */
 
-const config = require('../../serverConfig.js');
-const socketCommands = require('../../socketCommands');
-const serverGameHandler = require('../handler/serverGameHandler');
+const serverGameHandler = require(require.resolve('../handler/serverGameHandler'));
 
 class ServerRoom {
 

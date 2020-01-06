@@ -10,8 +10,7 @@ _games: [
 
  */
 
-const config = require('../../serverConfig.js');
-const ServerGame = require('../classes/serverGame');
+const ServerGame = require(require.resolve('../classes/serverGame'));
 
 class ServerGameHandler {
 

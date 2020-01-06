@@ -7,9 +7,9 @@ _rooms: [
 
  */
 
-const config = require('../../serverConfig.js');
-const socketCommands = require('../../socketCommands');
-const ServerRoom = require('../classes/serverRoom');
+const config = require(require.resolve('../../serverConfig.js'));
+const socketCommands = require(require.resolve('../../socketCommands'));
+const ServerRoom = require(require.resolve('../classes/serverRoom'));
 
 
 class ServerRoomHandler {

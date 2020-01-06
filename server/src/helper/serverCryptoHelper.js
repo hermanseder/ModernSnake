@@ -1,9 +1,9 @@
 // Dependencies
-const config = require('../../serverConfig');
 const bcrypt = require('bcrypt');
 const util = require('util');
 const sha256 = require('js-sha256');
 const jwt = require('jsonwebtoken');
+const config = require(require.resolve('../../serverConfig'));
 
 // External functions
 async function generateSaltAsync() {

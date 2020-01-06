@@ -61,11 +61,10 @@ _gameLoopRunning: boolean;
 
  */
 
-const config = require('../../serverConfig.js');
-const socketCommands = require('../../socketCommands');
-const requestHelper = require('../helper/requestHelper');
+const config = require(require.resolve('../../serverConfig.js'));
+const socketCommands = require(require.resolve('../../socketCommands'));
+const requestHelper = require(require.resolve('../helper/requestHelper'));
 const {interval} = require('rxjs');
-const {take} = require('rxjs/operators');
 
 class ServerGame {
 

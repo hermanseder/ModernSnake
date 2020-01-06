@@ -14,9 +14,8 @@ _loggedInUsers: [
 ]
  */
 
-const config = require('../../serverConfig.js');
-const serverCryptoHelper = require('../helper/serverCryptoHelper');
-const databaseHelper = require('../helper/databaseHelper');
+const serverCryptoHelper = require(require.resolve('../helper/serverCryptoHelper'));
+const databaseHelper = require(require.resolve('../helper/databaseHelper'));
 
 class ServerLoginHandler {
     constructor() {

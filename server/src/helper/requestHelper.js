@@ -1,5 +1,5 @@
 // Dependencies
-const serverCryptoHelper = require('./serverCryptoHelper')
+const serverCryptoHelper = require(require.resolve('./serverCryptoHelper'));
 
 // External functions
 function checkRequestValid(data) {

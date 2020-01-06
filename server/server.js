@@ -9,16 +9,16 @@ socketResult: {
 // Dependencies
 const socketIO = require('socket.io');
 const socketAuth = require('socketio-auth');
-const config = require('./serverConfig');
-const socketAuthenticationHelper = require('./src/helper/socketAuthenticationHelper');
-const serverCryptoHelper = require('./src/helper/serverCryptoHelper');
-const databaseHelper = require('./src/helper/databaseHelper');
-const socketCommands = require('./socketCommands');
-const requestHelper = require('./src/helper/requestHelper');
 
-const serverLoginHandler = require('D:/Documents/Data/FH/OwnCloud/3_Semester/WDP/Project/GIT/ModernSnake/server/src/handler/ServerLoginHandler');
-const serverRoomHandler = require('./src/handler/serverRoomHandler');
-const serverGameHandler = require('./src/handler/serverGameHandler');
+const config = require(require.resolve('./serverConfig'));
+const socketAuthenticationHelper = require(require.resolve('./src/helper/socketAuthenticationHelper'));
+const databaseHelper = require(require.resolve('./src/helper/databaseHelper'));
+const socketCommands = require(require.resolve('./socketCommands'));
+const requestHelper = require(require.resolve('./src/helper/requestHelper'));
+
+const serverLoginHandler = require(require.resolve('./src/handler/serverLoginHandler'));
+const serverRoomHandler = require(require.resolve('./src/handler/serverRoomHandler'));
+const serverGameHandler = require(require.resolve('./src/handler/serverGameHandler'));
 
 // Variables
 let ioCommunication;

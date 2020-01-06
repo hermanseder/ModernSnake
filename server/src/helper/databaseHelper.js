@@ -1,9 +1,10 @@
 // Dependencies
-const config = require('../../serverConfig');
 const fs = require('fs');
-const serverCryptoHelper = require('./serverCryptoHelper');
 const util = require('util');
 const sqlite3 = require('sqlite3').verbose();
+
+const config = require(require.resolve('../../serverConfig'));
+const serverCryptoHelper = require(require.resolve('./serverCryptoHelper'));
 
 // Variables
 let database;
