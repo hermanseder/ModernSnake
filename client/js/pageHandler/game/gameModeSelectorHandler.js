@@ -387,6 +387,13 @@ let GameModeSelectorHandler = (function () {
         return _selectedDifficulty.first().val();
     }
 
+    function _getRoomName() {
+        if (!_roomNameInput) return undefined;
+        if (!_roomNameInput.val()) return undefined;
+        if (_roomNameInput.val().length <= 0) return undefined;
+        return _roomNameInput.val();
+    }
+
     function _isInputValid() {
         let valid = true;
 
@@ -394,7 +401,11 @@ let GameModeSelectorHandler = (function () {
         valid = valid && _getDifficulty() !== undefined;
 
         if (_currentModeMultiPlayer) {
-            valid = valid && _roomNameInput.val().length >= ModernSnakeConfig.minimumRoomLength;
+            const roomName = _getRoomName();
+            console.log(roomName);
+            valid = valid && roomName !== undefined;
+            valid = valid && roomName.length >= ModernSnakeConfig.minimumRoomLength;
+            valid = valid && _currentRoomsArray.indexOf(roomName) < 0;
         }
 
         return valid;
@@ -422,7 +433,37 @@ let GameModeSelectorHandler = (function () {
 
     function _createRoom() {
         if (!_isInputValid()) return;
-        console.log('create room');
+
+        let command = undefined;
+        switch (_currentMode) {
+            case ModernSnakeGameModes.twoPlayer:
+                command = socketCommands.createRoom2;
+                break;
+            case ModernSnakeGameModes.threePlayer:
+                command = socketCommands.createRoom3;
+                break;
+            case ModernSnakeGameModes.fourPlayer:
+                command = socketCommands.createRoom4;
+                break;
+        }
+        if (command !== undefined) {
+            const roomName = _getRoomName();
+            const level = _getLevel();
+            const difficulty = _getDifficulty();
+
+            _ioCommunication.emit(command, LoginHandler.getAuth(), roomName, level, difficulty, _roomCreated);
+        }
+    }
+
+    function _roomCreated(data) {
+        if (!data) return;
+        if (data.success) {
+            GenericUiHandler.resetMaterialInput(_roomNameInput);
+            GenericUiHandler.resetMaterialSelect(_selectGameLevel);
+            GenericUiHandler.resetMaterialSelect(_selectGameDifficulty);
+        } else {
+            ErrorHandler.showErrorMessage(data.failure);
+        }
     }
 
     function _loadPlayground() {

@@ -17,9 +17,23 @@ const GenericUiHandler = (function () {
         return destination;
     }
 
+    function resetMaterialSelect(element) {
+        element.find('input').val('');
+        element.prop('selectedIndex', 0);
+        element.formSelect();
+    }
+
+    function resetMaterialInput(element) {
+        element.val('');
+        element.removeClass('valid');
+        element.next().removeClass('active');
+    }
+
     /* Exports */
     return {
         getAttribute: getAttribute,
         getHrefDestination: getHrefDestination,
+        resetMaterialSelect: resetMaterialSelect,
+        resetMaterialInput: resetMaterialInput,
     };
 })();

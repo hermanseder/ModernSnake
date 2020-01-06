@@ -21,8 +21,8 @@ let LoginUiHandler = (function () {
     }
 
     function clearLogin() {
-        _loginUsername.val('');
-        _loginPassword.val('');
+        GenericUiHandler.resetMaterialInput(_loginUsername);
+        GenericUiHandler.resetMaterialInput(_loginPassword);
         _removeErrorMessage();
     }
 

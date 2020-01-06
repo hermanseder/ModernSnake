@@ -28,6 +28,7 @@ class ServerRoomHandler {
         if (this.hasRoom(name)) throw new Error('NAME_ALREADY_USED');
         this._rooms.set(name, new ServerRoom(this._ioCommunication, name, level,
             countPlayers, speedDegree, this._roomEndCallback.bind(this)));
+        this._roomsUpdated();
     }
 
     closeRoom(name) {

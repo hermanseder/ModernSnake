@@ -67,6 +67,9 @@ function _initializeHandlersGame(socket) {
     socket.on(socketCommands.startSinglePlayer, ((auth, difficulty, level, callback) =>
         _startSinglePlayer(auth, socket, difficulty, level, callback)));
     socket.on(socketCommands.leaveRoom, (auth) => _leaveRoom(auth, socket.id));
+    socket.on(socketCommands.createRoom2, (auth, roomName, level, difficulty, callback) => _createRoom(auth, roomName, level, difficulty, 2, callback));
+    socket.on(socketCommands.createRoom3, (auth, roomName, level, difficulty, callback) => _createRoom(auth, roomName, level, difficulty, 3, callback));
+    socket.on(socketCommands.createRoom4, (auth, roomName, level, difficulty, callback) => _createRoom(auth, roomName, level, difficulty, 4, callback));
 
     socket.on(socketCommands.getRooms2, (auth, callback) => _getRooms(2, auth, callback));
     socket.on(socketCommands.getRooms3, (auth, callback) => _getRooms(3, auth, callback));
@@ -152,11 +155,21 @@ function _getCurrentRoom(size, auth, socketId, callback) {
     }
 }
 
+function _createRoom(auth, roomName, level, difficulty, countPlayers, callback) {
+    try {
+        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUTH_INVALID');
+        serverRoomHandler.createRoom(roomName, level, countPlayers, Number(difficulty), callback);
+        callback({success: true});
+    } catch (e) {
+        console.log(e);
+        if (callback) callback({success: false, failure: e.message});
+    }
+}
+
 function _joinRoom(auth, name, socket, callback) {
     try {
         if (!requestHelper.checkRequestValid(auth)) throw new Error('AUTH_INVALID');
         serverRoomHandler.joinRoom(name, socket);
-        // TODO update room list
         callback({success: true});
     } catch (e) {
         console.log(e);
