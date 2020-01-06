@@ -3,6 +3,7 @@ socketCommands = {
     unauthorized: 'unauthorized',
     loginRequest: 'loginRequest',
     loginSucceeded: 'loginSucceeded',
+    logout: 'logout',
 
     startSinglePlayer: 'startSinglePlayer',
     getRooms2: 'getRooms2',

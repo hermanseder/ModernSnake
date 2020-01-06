@@ -1,8 +1,10 @@
 module.exports = {
+    authentication: 'authentication',
     disconnect: 'disconnect',
 
     loginRequest: 'loginRequest',
     loginSucceeded: 'loginSucceeded',
+    logout: 'logout',
 
     startSinglePlayer: 'startSinglePlayer',
     getRooms2: 'getRooms2',

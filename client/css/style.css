@@ -221,9 +221,9 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 7px 0 9px -7px rgba(0, 0, 0, 0.4);
 }
 
-.usermenu > h2 {
+.usermenu h2 {
     color: #eff0eb;
-    margin: 15px 0 15px 15px;
+    margin: 15px 0 15px 10px;
 }
 
 .usermenu input {
@@ -251,6 +251,9 @@ h1, h2, h3, h4, h5, h6 {
     display: inherit;
 }
 
+#logged-in-container {
+    margin-top: 20px;
+}
 
 /* MAIN */
 .main {

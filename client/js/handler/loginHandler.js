@@ -25,6 +25,21 @@ const LoginHandler = (function () {
         _socketCommunication.emit(socketCommands.authentication, {username: username});
     }
 
+    function logout() {
+        _socketCommunication.emit(socketCommands.logout, getAuth(), _logoutDone);
+    }
+
+    function _logoutDone(result) {
+        if (!result) return;
+        if (result.success) {
+            _currentUser = undefined;
+            _currentToken = undefined;
+            LoginUiHandler.loginLogoutSucceeds();
+        } else {
+            ErrorHandler.showErrorMessage(result.failure);
+        }
+    }
+
     function isLoggedIn() {
         console.log(_currentUser);
         return _currentUser !== undefined;
@@ -64,7 +79,7 @@ const LoginHandler = (function () {
     }
 
     function _loginSucceeded(data) {
-        if (!_requestReceived || !data || !data.token){
+        if (!_requestReceived || !data || !data.token) {
             _loginFailed('MISSING_DATA');
             return;
         }
@@ -75,8 +90,7 @@ const LoginHandler = (function () {
         _passwordHash = undefined;
         _requestedUser = undefined;
 
-        LoginUiHandler.updateCurrentUser(_currentUser);
-        LoginUiHandler.clearLogin();
+        LoginUiHandler.loginLogoutSucceeds(_currentUser);
         ContentHandler.closeUsermenu();
         _loginEnd();
         console.log('current token: ' + _currentToken);
@@ -115,6 +129,7 @@ const LoginHandler = (function () {
     return {
         initialize: initialize,
         login: login,
+        logout: logout,
         isLoggedIn: isLoggedIn,
         getAuth: getAuth,
     };

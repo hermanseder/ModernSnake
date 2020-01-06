@@ -1,6 +1,6 @@
 // Dependencies
 const socketCommands = require('../../socketCommands');
-const serverLoginHandler = require('../handler/ServerLoginHandler');
+const serverLoginHandler = require('D:/Documents/Data/FH/OwnCloud/3_Semester/WDP/Project/GIT/ModernSnake/server/src/handler/ServerLoginHandler');
 const serverRoomHandler = require('../handler/serverRoomHandler');
 
 // External functions

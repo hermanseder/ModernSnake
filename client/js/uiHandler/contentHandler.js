@@ -33,6 +33,10 @@ const ContentHandler = (function () {
     function initializeSidebar() {
         sidebarToggle.click(sidebarToggleClick);
         sidebarElements.click(menuElementClick);
+        setDefaultLocation();
+    }
+
+    function setDefaultLocation() {
         setMenuItem(sidebarElements[0]);
     }
 
@@ -124,5 +128,6 @@ const ContentHandler = (function () {
         initialize: initialize,
         closeUsermenu: closeUsermenu,
         openUsermenu: openUsermenu,
+        setDefaultLocation: setDefaultLocation,
     };
 })();

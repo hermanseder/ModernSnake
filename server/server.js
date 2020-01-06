@@ -16,7 +16,7 @@ const databaseHelper = require('./src/helper/databaseHelper');
 const socketCommands = require('./socketCommands');
 const requestHelper = require('./src/helper/requestHelper');
 
-const serverLoginHandler = require('./src/handler/serverLoginHandler');
+const serverLoginHandler = require('D:/Documents/Data/FH/OwnCloud/3_Semester/WDP/Project/GIT/ModernSnake/server/src/handler/ServerLoginHandler');
 const serverRoomHandler = require('./src/handler/serverRoomHandler');
 const serverGameHandler = require('./src/handler/serverGameHandler');
 
@@ -45,7 +45,7 @@ function _initializeSocket() {
     // nothing to do.
 }
 
-function _initializeAuthentication(timeout) {
+function _initializeAuthentication() {
     socketAuth(ioCommunication, {
         authenticate: socketAuthenticationHelper.authenticate,
         postAuthenticate: _initializeHandlers,
@@ -61,6 +61,8 @@ function _initializeHandlers(socket, data) {
 /* GAME */
 
 function _initializeHandlersGame(socket) {
+    socket.on(socketCommands.logout, (auth, callback) =>  _logout(socket, auth, callback));
+
     socket.on(socketCommands.getDifficulty, _getDifficulty);
     socket.on(socketCommands.getLevels, _getLevels);
 
@@ -82,6 +84,30 @@ function _initializeHandlersGame(socket) {
     socket.on(socketCommands.getCurrentRoom4, (auth, callback) => _getCurrentRoom(4, auth, socket.id, callback));
 
     socket.on(socketCommands.joinRoom, (auth, name, callback) => _joinRoom(auth, name, socket, callback));
+}
+
+function _removeListener(socket) {
+    socket.disconnect;
+    for (const eventName of socket.eventNames()) {
+        if (eventName === socketCommands.authentication) continue;
+        socket.removeAllListeners(eventName);
+    }
+}
+
+function _logout(socket, auth, callback) {
+    try {
+        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
+        serverRoomHandler.leaveRoom(socket.id);
+        serverLoginHandler.logoutAsync(socket.username)
+            .then(() => {
+                _removeListener(socket);
+                callback({success: true})
+            })
+            .catch((error) => callback({success: false, failure: error.message}));
+    } catch (e) {
+        if (callback) callback([]);
+        console.log(e);
+    }
 }
 
 function _getDifficulty(auth, callback) {
@@ -216,93 +242,3 @@ module.exports = {
     startServerAsync: startServerAsync,
     stopServer: stopServer
 };
-
-
-//
-//
-// // Functions
-// function startServer(server, timeout, userCredentialPath) {
-//     socketCommunication.connect(server);
-// }
-//
-// async function test() {
-//     await databaseHelper.initializeAsync();
-//
-//
-//     // server
-//     const serverSalt = await serverLoginHandler.requestLoginAsync('1234', 'rudi');
-//     console.log(`SERVER SALT: ${serverSalt}`);
-//
-//     // client
-//     const clientSalt = await serverCryptoHelper.generateSaltAsync();
-//     const passwordHash1 = await serverCryptoHelper.generatePasswordHash('pw', 'ModernSnake');
-//     // const passwordHash = await serverCryptoHelper.generatePasswordHash(passwordHash1, serverSalt);
-//     const clientHash1 = await serverCryptoHelper.generateHashAsync(passwordHash1, serverSalt);
-//     const clientHash = await serverCryptoHelper.generateHashAsync(clientHash1, clientSalt);
-//
-//     // server
-//     try {
-//         await serverLoginHandler.loginAsync('1234', 'rudi', clientHash);
-//         console.log(serverLoginHandler.getToken('1234', 'rudi'));
-//         // console.log(await serverLoginHandler.isLoggedInAndValidAsync('1234', 'rudi', t));
-//         // console.log(await serverLoginHandler.isLoggedInAndValidAsync('123', 'rudi', t));
-//         // console.log(await serverLoginHandler.isLoggedInAndValidAsync('1234', 'geri', t));
-//     } catch (e) {
-//         console.log(e);
-//     }
-//
-//     return ;
-//
-//     const result2 = await serverCryptoHelper.compareHashAsync(await serverCryptoHelper.generatePasswordHash('password', 'ModernSnake'), serverSalt, clientHash);
-//     console.log(`COMPARE2: ${result2}`);
-//     console.log(`DUMMY: ${await serverCryptoHelper.generateDummySaltAsync('rudi')}`);
-//     console.log(`DUMMY: ${await serverCryptoHelper.generateDummySaltAsync('rudi')}`);
-//     console.log(`DUMMY: ${await serverCryptoHelper.generateDummySaltAsync('geri')}`);
-//
-// }
-// function initializeAuthentication(timeout) {
-//     socketAuth(io, {
-//         authenticate: authenticate,
-//         postAuthenticate: postAuthenticate,
-//         disconnect: disconnect,
-//         timeout: timeout
-//     })
-// }
-//
-// function authenticate(socket, data, callback) {
-//     if (userHandler.isUserLoggedIn(data.username)) {
-//         return callback({ message: 'ALREADY_LOGGED_IN' });
-//     }
-//
-//     const success = userHandler.login(data.username, data.password, socket);
-//     if (success) {
-//         socket.user = data.username;
-//         return callback(null, success);
-//     } else {
-//         return callback({ message: 'INVALID_CREDENTIALS_OR_USER' });
-//     }
-// }
-//
-// function postAuthenticate(socket, data) {
-//     console.log('post authenticated');
-//     socket.on('movement', function (data) {
-//         console.log('movement: ' + data);
-//         io.sockets.emit('update', data);
-//     });
-// }
-//
-// function disconnect(socket) {
-//     console.log(socket.user);
-//     userHandler.logout(socket.user);
-//     console.log(socket.id + ' disconnected');
-// }
-//
-// function initializeSockets() {
-//     io.set('authorization', function (handshake, callback) {
-//         // accept everything. future check domain or something like this.
-//         callback(null, true);
-//     });
-//     io.on('connect', function (socket) {
-//         console.log('connection');
-//     });
-// }
