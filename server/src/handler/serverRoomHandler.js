@@ -8,6 +8,7 @@ _rooms: [
  */
 
 const config = require('../../serverConfig.js');
+const socketCommands = require('../../socketCommands');
 const ServerRoom = require('../classes/serverRoom');
 
 
@@ -43,20 +44,35 @@ class ServerRoomHandler {
         const room = this._rooms.get(name);
         if (!room.isAccessible()) throw new Error('ROOM_NOT_ACCESSIBLE');
 
+        this.leaveRoom(sourceSocket.id, false);
         room.joinRoom(sourceSocket);
+        this._roomsUpdated();
     }
 
-    leaveRoom(sourceId) {
+    leaveRoom(sourceId, emitEvent = true) {
+        let roomLeaved = false;
         for (const [name, room] of this._rooms) {
-            room.leaveRoom(sourceId);
+            const result = room.leaveRoom(sourceId);
+            roomLeaved = roomLeaved || result;
             if (room.roomEmptyAndGameStarted()) {
                 this.closeRoom(name);
             }
         }
+        if (roomLeaved && emitEvent) this._roomsUpdated();
     }
 
     hasRoom(name) {
         return this._rooms.has(name);
+    }
+
+    getCurrentRoom(countPlayers, playerId) {
+        for (const [source, room] of this._rooms) {
+            if (room.getSize() != countPlayers) continue;
+            if (room.hasPlayer(playerId)) {
+                return source;
+            }
+        }
+        return undefined;
     }
 
     getRooms(countPlayers) {
@@ -72,6 +88,12 @@ class ServerRoomHandler {
             });
         }
         return result;
+    }
+
+    _roomsUpdated() {
+        this._ioCommunication.emit(socketCommands.updateRooms2, this.getRooms(2));
+        this._ioCommunication.emit(socketCommands.updateRooms3, this.getRooms(3));
+        this._ioCommunication.emit(socketCommands.updateRooms4, this.getRooms(4));
     }
 
     _roomEndCallback(name) {

@@ -1,3 +1,11 @@
+/*
+socketResult: {
+    success: boolean;
+    failure?: string;
+    data?: any;
+}
+ */
+
 // Dependencies
 const socketIO = require('socket.io');
 const socketAuth = require('socketio-auth');
@@ -59,9 +67,14 @@ function _initializeHandlersGame(socket) {
     socket.on(socketCommands.startSinglePlayer, ((auth, difficulty, level, callback) =>
         _startSinglePlayer(auth, socket, difficulty, level, callback)));
     socket.on(socketCommands.leaveRoom, (auth) => _leaveRoom(auth, socket.id));
+
     socket.on(socketCommands.getRooms2, (auth, callback) => _getRooms(2, auth, callback));
     socket.on(socketCommands.getRooms3, (auth, callback) => _getRooms(3, auth, callback));
     socket.on(socketCommands.getRooms4, (auth, callback) => _getRooms(4, auth, callback));
+
+    socket.on(socketCommands.getCurrentRoom2, (auth, callback) => _getCurrentRoom(2, auth, socket.id, callback));
+    socket.on(socketCommands.getCurrentRoom3, (auth, callback) => _getCurrentRoom(3, auth, socket.id, callback));
+    socket.on(socketCommands.getCurrentRoom4, (auth, callback) => _getCurrentRoom(4, auth, socket.id, callback));
 
     socket.on(socketCommands.joinRoom, (auth, name, callback) => _joinRoom(auth, name, socket, callback));
 }
@@ -126,15 +139,28 @@ function _getRooms(size, auth, callback) {
     }
 }
 
+function _getCurrentRoom(size, auth, socketId, callback) {
+    try {
+        let result = undefined;
+        if (requestHelper.checkRequestValid(auth)) {
+            result = serverRoomHandler.getCurrentRoom(size, socketId);
+        }
+        callback({success: true, data: result});
+    } catch (e) {
+        if (callback) callback({success: false, failure: e.message});
+        console.log(e);
+    }
+}
+
 function _joinRoom(auth, name, socket, callback) {
     try {
         if (!requestHelper.checkRequestValid(auth)) throw new Error('AUTH_INVALID');
         serverRoomHandler.joinRoom(name, socket);
         // TODO update room list
-        callback(true);
+        callback({success: true});
     } catch (e) {
         console.log(e);
-        if (callback) callback(false);
+        if (callback) callback({success: false, failure: e.message});
     }
 }
 

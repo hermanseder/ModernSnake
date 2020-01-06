@@ -90,6 +90,8 @@ class ServerGame {
             config.gameBeforeTime, config.gameAfterTime);
 
         this._addPlayerListener();
+        console.log('emit gamestart event to ' + this._id);
+        this._ioCommunication.to(this._id).emit(socketCommands.gameStart);
         this._startGameLoop();
     }
 
@@ -244,7 +246,7 @@ class ServerGame {
 
     _setNewDirections() {
         for (const snake of this._gameData.game.snakes) {
-            if (snake.directionRequest === undefined) return;
+            if (snake.directionRequest === undefined) continue;
             snake.direction = snake.directionRequest;
             snake.directionRequest = undefined;
         }

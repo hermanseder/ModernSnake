@@ -82,7 +82,7 @@ const LoginHandler = (function () {
         console.log('current token: ' + _currentToken);
 
         // TODO REMOVE
-        // PageHandler.updatePath('game');
+        PageHandler.updatePath('game');
     }
 
     function _loginEnd() {

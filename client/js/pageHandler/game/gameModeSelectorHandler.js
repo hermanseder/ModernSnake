@@ -10,12 +10,14 @@ let GameModeSelectorHandler = (function () {
     const _playgroundPath = 'pages/game/gamePlayground.html';
     const _selectedOption = 'option:selected';
     const _roomSelectedClass = 'room-selection-active';
+    const _dataRoomIdAttribute = 'data-room-id';
 
     /* Variables */
     let _ioCommunication;
     let _currentMode;
     let _currentModeMultiPlayer;
     let _roomSelectionContainer;
+    let _roomSelectionContent;
     let _playgroundContainer;
     let _levelSelectionContainer;
 
@@ -29,14 +31,20 @@ let GameModeSelectorHandler = (function () {
     let _roomCreateButton;
 
     let _currentRooms;
+    let _currentRoomsArray;
+
+    let _currentSelectedRoom;
 
     /* External functions */
     function construct(socket) {
         _ioCommunication = socket;
         _currentModeMultiPlayer = false;
+        _currentRoomsArray = [];
     }
 
     function initialize(modeId) {
+        _removeSocketListener();
+
         _initializeDomElements();
         _fillOptions();
         _initializeSocketListener();
@@ -44,7 +52,6 @@ let GameModeSelectorHandler = (function () {
         _roomSelectionContainer.hide();
         _levelSelectionContainer.hide();
         _playgroundContainer.hide();
-        _initializeSinglePlayer();
 
         _updateMode(modeId);
     }
@@ -53,6 +60,7 @@ let GameModeSelectorHandler = (function () {
         _currentMode = -1;
         _removeModeListener();
         _removeSocketListener();
+        _removeGameStartListener();
         GamePlaygroundHandler.stopGame();
     }
 
@@ -63,10 +71,18 @@ let GameModeSelectorHandler = (function () {
 
     function _removeSocketListener() {
         _ioCommunication.removeAllListeners(socketCommands.updateLevels);
+        _ioCommunication.removeAllListeners(socketCommands.updateRooms2);
+        _ioCommunication.removeAllListeners(socketCommands.updateRooms3);
+        _ioCommunication.removeAllListeners(socketCommands.updateRooms4);
+    }
+
+    function _removeGameStartListener() {
+        _ioCommunication.removeAllListeners(socketCommands.gameStart);
     }
 
     function _initializeDomElements() {
         _roomSelectionContainer = $('#room-selection-container');
+        _roomSelectionContent = $('#room-selection-content');
         _levelSelectionContainer = $('#level-selection-handler');
         _playgroundContainer = $('#playground-container');
 
@@ -78,6 +94,49 @@ let GameModeSelectorHandler = (function () {
         _roomNameInput = $('#room-name');
         _roomCreateContainer = $('#room-create-container');
         _roomCreateButton = $('#room-create');
+    }
+
+    function _updateMode(modeId) {
+        GamePlaygroundHandler.stopGame();
+        _currentMode = Number(modeId);
+        _currentSelectedRoom = undefined;
+        switch (_currentMode) {
+            case ModernSnakeGameModes.onePlayer:
+                _initializeSinglePlayer();
+                break;
+            case ModernSnakeGameModes.twoPlayer:
+                _ioCommunication.on(socketCommands.updateRooms2, _roomsUpdated);
+                _initializeMultiPlayer();
+                break;
+            case ModernSnakeGameModes.threePlayer:
+                _ioCommunication.on(socketCommands.updateRooms3, _roomsUpdated);
+                _initializeMultiPlayer();
+                break;
+            case ModernSnakeGameModes.fourPlayer:
+                _ioCommunication.on(socketCommands.updateRooms4, _roomsUpdated);
+                _initializeMultiPlayer();
+                break;
+            default:
+                console.error('Invalid mode given');
+        }
+    }
+
+    function _roomsUpdated(data) {
+        if (!data) {
+            _roomSelectionContent.empty();
+            return;
+        }
+
+        for (let i = 0; i < data.length; i++) {
+            const roomName = data[i].name;
+            if (_currentRoomsArray.indexOf(roomName) >= 0) {
+                _updateRoomRow(data[i]);
+            } else {
+                _roomSelectionContent.append(_createRoomRow(data[i]));
+                _currentRoomsArray.push(roomName);
+            }
+        }
+        _updateRoomListener();
     }
 
     function _fillOptions() {
@@ -105,23 +164,6 @@ let GameModeSelectorHandler = (function () {
         _selectGameDifficulty.formSelect();
     }
 
-    function _updateMode(modeId) {
-        GamePlaygroundHandler.stopGame();
-        _currentMode = Number(modeId);
-        switch (_currentMode) {
-            case ModernSnakeGameModes.onePlayer:
-                _initializeSinglePlayer();
-                break;
-            case ModernSnakeGameModes.twoPlayer:
-            case ModernSnakeGameModes.threePlayer:
-            case ModernSnakeGameModes.fourPlayer:
-                _initializeMultiPlayer();
-                break;
-            default:
-                console.error('Invalid mode given');
-        }
-    }
-
     function _initializeSinglePlayer() {
         _currentModeMultiPlayer = false;
 
@@ -146,8 +188,9 @@ let GameModeSelectorHandler = (function () {
         _initializeModeListener();
         _roomCreateButton.on('click', _createRoom);
 
-        _roomSelectionContainer.show();
         _gameStartContainer.hide();
+        _levelSelectionContainer.show();
+        _roomSelectionContainer.show();
         _roomNameContainer.show();
         _roomCreateContainer.show();
 
@@ -176,9 +219,7 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _loadAvailableRooms() {
-        console.log('load ');
         let command = undefined;
-        console.log(_currentMode);
         switch (_currentMode) {
             case ModernSnakeGameModes.twoPlayer:
                 command = socketCommands.getRooms2;
@@ -191,55 +232,145 @@ let GameModeSelectorHandler = (function () {
                 break;
         }
         if (command !== undefined) {
-            console.log('load rooms');
             _ioCommunication.emit(command, LoginHandler.getAuth(), _fillRooms);
         }
     }
 
     function _fillRooms(rooms) {
-        _roomSelectionContainer.empty();
-        _roomSelectionContainer.append(_createRoomHeader());
+        _roomSelectionContent.empty();
+        _currentRoomsArray = [];
+
         for (let i = 0; i < rooms.length; i++) {
-            _roomSelectionContainer.append(_createRoomRow(rooms[i]));
+            _roomSelectionContent.append(_createRoomRow(rooms[i]));
+            _currentRoomsArray.push(rooms[i].name);
         }
-        _updateRooms();
+        _updateRoomListener();
+        _loadCurrentRoom();
     }
 
-    function _updateRooms() {
-        _currentRooms = _roomSelectionContainer.find('.room-selection-row');
-        _currentRooms.on('click', _roomSelected);
+    function _loadCurrentRoom() {
+        let command = undefined;
+        switch (_currentMode) {
+            case ModernSnakeGameModes.twoPlayer:
+                command = socketCommands.getCurrentRoom2;
+                break;
+            case ModernSnakeGameModes.threePlayer:
+                command = socketCommands.getCurrentRoom3;
+                break;
+            case ModernSnakeGameModes.fourPlayer:
+                command = socketCommands.getCurrentRoom4;
+                break;
+        }
+        if (command !== undefined) {
+            _ioCommunication.emit(command, LoginHandler.getAuth(), _updateCurrentRoom);
+        }
     }
 
-    function _roomSelected(source) {
+    function _updateCurrentRoom(data) {
+        if (!data) return;
+        if (!data.success) return;
+        if (!data.data) return;
+
+        _currentSelectedRoom = data.data;
+        let element = undefined;
         _currentRooms.each(function () {
-                if ($(this).length > 0 && source.delegateTarget === $(this)[0]) {
+            const roomId = GenericUiHandler.getAttribute($(this), _dataRoomIdAttribute);
+            if (roomId === _currentSelectedRoom) {
+                element = $(this);
+                return;
+            }
+        });
+        if (element !== undefined) {
+            _updateSelectedRoom(element.get(0));
+        }
+    }
+
+    function _updateRoomListener() {
+        _currentRooms = _roomSelectionContainer.find('.room-selection-row');
+        _currentRooms.off('click');
+
+        const activeRooms = _currentRooms.not('.' + _roomSelectedClass);
+        activeRooms.on('click', _joinRoom);
+    }
+
+    function _joinRoom(source) {
+        const roomId = GenericUiHandler.getAttribute($(source.delegateTarget), _dataRoomIdAttribute);
+        if (roomId === _currentSelectedRoom) return;
+
+        if (roomId === undefined) {
+            ErrorHandler.showErrorMessage('ROOM_ID_MISSING');
+            return;
+        }
+
+        _removeGameStartListener();
+        _registerGameStartListener();
+        _ioCommunication.emit(socketCommands.joinRoom, LoginHandler.getAuth(), roomId,
+            function (result) {
+                _joinRoomCallback(result, source.delegateTarget, roomId);
+            }
+        );
+        _updateSelectedRoom(source.delegateTarget);
+    }
+
+    function _joinRoomCallback(data, source, roomId) {
+        if (!data) return;
+        if (data.success) {
+            _currentSelectedRoom = roomId;
+            _updateSelectedRoom(source);
+        } else {
+            ErrorHandler.showErrorMessage(data.failure);
+        }
+    }
+
+    function _registerGameStartListener() {
+        console.log('register game start listener');
+        _ioCommunication.on(socketCommands.gameStart, _multiPlayerStarted);
+    }
+
+    function _updateSelectedRoom(source) {
+        _currentRooms.each(function () {
+                if ($(this).length > 0 && source === $(this)[0]) {
                     $(this).addClass(_roomSelectedClass);
                 } else {
                     $(this).removeClass(_roomSelectedClass);
                 }
             }
         );
-        console.log('room selected');
-    }
-
-    function _createRoomHeader() {
-        let element = '<div class="room-selection-header row">';
-        element += '<div class="room-header col s6 m4">Name</div>';
-        element += '<div class="room-header col s6 m3">Level</div>';
-        element += '<div class="room-header col s6 m3">Difficulty</div>';
-        element += '<div class="room-header col s6 m1">Places</div>';
-        element += '</div>';
-        return element;
+        _updateRoomListener();
     }
 
     function _createRoomRow(roomData) {
-        let element = '<div class="room-selection-row row">';
+        let element = '<div class="room-selection-row row" ' + _dataRoomIdAttribute + '="' + roomData.name + '">';
         element += '<div class="room-name col s12 m4">' + roomData.name + '</div>';
         element += '<div class="room-level col s12 m3">' + roomData.level + '</div>';
-        element += '<div class="room-difficulty col s8 m3">Difficulty ' + roomData.difficulty + '</div>';
-        element += '<div class="room-size col s4 m1">' + (roomData.size - roomData.remainingPlaces) + ' | ' + roomData.size + '</div>';
+        element += '<div class="room-difficulty col s8 m3">' + _getDifficultyFormatted(roomData.difficulty) + '</div>';
+        element += '<div class="room-size col s4 m1">' + _getRoomSizeFormatted(roomData.size, roomData.remainingPlaces) + '</div>';
         element += '</div>';
         return element;
+    }
+
+    function _updateRoomRow(roomData) {
+        let element = undefined;
+        _currentRooms.each(function () {
+            const roomId = GenericUiHandler.getAttribute($(this), _dataRoomIdAttribute);
+            if (roomId === roomData.name) {
+                element = $(this);
+                return;
+            }
+        });
+        if (element !== undefined) {
+            element.find('.room-level').text(roomData.level);
+            element.find('.room-difficulty').text(_getDifficultyFormatted(roomData.difficulty));
+            element.find('.room-size').text(_getRoomSizeFormatted(roomData.size, roomData.remainingPlaces));
+        }
+    }
+
+    function _getRoomSizeFormatted(size, remainingPlaces) {
+        return (size - remainingPlaces) + ' | ' + size
+    }
+
+    function _getDifficultyFormatted(difficulty) {
+        return 'Difficulty ' + difficulty;
     }
 
     function _getLevel() {
@@ -275,13 +406,17 @@ let GameModeSelectorHandler = (function () {
         const level = _getLevel();
         const difficulty = _getDifficulty();
         _ioCommunication.emit(socketCommands.startSinglePlayer, LoginHandler.getAuth(),
-            difficulty, level, _gameStarted);
+            difficulty, level, _singlePlayerStarted);
     }
 
-    function _gameStarted(result) {
+    function _singlePlayerStarted(result) {
         // TODO show message
         if (!result) console.error('Unable to start single player');
+        _loadPlayground();
+    }
 
+    function _multiPlayerStarted() {
+        console.log('multi player started event');
         _loadPlayground();
     }
 
@@ -292,6 +427,7 @@ let GameModeSelectorHandler = (function () {
 
     function _loadPlayground() {
         _levelSelectionContainer.hide();
+        _roomSelectionContainer.hide();
         _playgroundContainer.empty();
         // _roomSelectionContainer.hide();
         _playgroundContainer.load(_playgroundPath, undefined, function () {
@@ -305,6 +441,9 @@ let GameModeSelectorHandler = (function () {
         _playgroundContainer.hide();
         _playgroundContainer.empty();
         _levelSelectionContainer.show();
+        if (_currentModeMultiPlayer) {
+            _roomSelectionContainer.show();
+        }
     }
 
     return {

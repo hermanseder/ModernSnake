@@ -2,7 +2,7 @@
 const socket = io();
 
 $(document).on('ready', function () {
-    SocketHandler.initialize(socket);
+    // SocketHandler.initialize(socket);
     LoginHandler.initialize(socket);
 
     LoginUiHandler.initialize();

@@ -55,15 +55,17 @@ class ServerRoom {
         return this._countPlayers - this._currentPlayers.size;
     }
 
+    hasPlayer(playerId) {
+        return this._currentPlayers.has(playerId);
+    }
+
     joinRoom(socketSource) {
         if (!this.isAccessible()) throw new Error('ROOM_NOT_ACCESSIBLE');
+        if (this._currentPlayers.has(socketSource.id)) throw new Error('ALREADY_IN_ROOM');
 
         this._currentPlayers.set(socketSource.id, {socket: socketSource, username: socketSource.username});
-        if (socketSource.username) {
-            socketSource.join(this._name);
-        } else {
-            console.log('no socket');
-        }
+        console.log('join ' + socketSource.id + ' to ' + this._name);
+        socketSource.join(this._name);
 
         if (this.getRemainingPlaces() <= 0) {
             this._startGame();
@@ -73,9 +75,13 @@ class ServerRoom {
     leaveRoom(socketId) {
         if (this._currentPlayers.has(socketId)) {
             if (this._currentPlayers.get(socketId).socket.username) this._currentPlayers.get(socketId).socket.leave(this._name);
-            this._currentGame.playerLeave(socketId);
+            if (this._currentGame !== undefined) {
+                this._currentGame.playerLeave(socketId);
+            }
             this._currentPlayers.delete(socketId);
+            return true;
         }
+        return false;
     }
 
     roomEmptyAndGameStarted() {
