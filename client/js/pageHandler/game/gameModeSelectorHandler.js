@@ -202,6 +202,7 @@ let GameModeSelectorHandler = (function () {
         _removeModeListener();
         _initializeModeListener();
         _roomCreateButton.on('click', _createRoom);
+        _roomNameInput.on('keyup', _createRoomKeyEvent);
 
         _gameStartContainer.hide();
         _levelSelectionContainer.show();
@@ -215,9 +216,6 @@ let GameModeSelectorHandler = (function () {
     function _initializeModeListener() {
         _selectGameLevel.on('change', _checkStartOrCreateValid);
         _selectGameDifficulty.on('change', _checkStartOrCreateValid);
-        if (_currentModeMultiPlayer) {
-            _roomNameInput.on('keyup', _checkStartOrCreateValid);
-        }
     }
 
     function _removeModeListener() {
@@ -443,6 +441,14 @@ let GameModeSelectorHandler = (function () {
     function _multiPlayerStarted() {
         console.log('multi player started event');
         _loadPlayground();
+    }
+
+    function _createRoomKeyEvent(event) {
+        if (event.keyCode === ModernSnakeKeyCodes.keyEnter) {
+            _createRoom();
+        } else {
+            _checkStartOrCreateValid();
+        }
     }
 
     function _createRoom() {
