@@ -75,6 +75,8 @@ function _initializeHandlersGame(socket) {
     socket.on(socketCommands.getRooms3, (auth, callback) => _getRooms(3, auth, callback));
     socket.on(socketCommands.getRooms4, (auth, callback) => _getRooms(4, auth, callback));
 
+    socket.on(socketCommands.getRoomNames, _getRoomNames);
+
     socket.on(socketCommands.getCurrentRoom2, (auth, callback) => _getCurrentRoom(2, auth, socket.id, callback));
     socket.on(socketCommands.getCurrentRoom3, (auth, callback) => _getCurrentRoom(3, auth, socket.id, callback));
     socket.on(socketCommands.getCurrentRoom4, (auth, callback) => _getCurrentRoom(4, auth, socket.id, callback));
@@ -125,6 +127,19 @@ function _leaveRoom(auth, socketId) {
         if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
         serverRoomHandler.leaveRoom(socketId);
     } catch (e) {
+        console.log(e);
+    }
+}
+
+function _getRoomNames(auth, callback) {
+    try {
+        let result = [];
+        if (requestHelper.checkRequestValid(auth)) {
+            result = serverRoomHandler.getRoomNames();
+        }
+        callback({success: true, data: result});
+    } catch (e) {
+        if (callback) callback({success: false, failure: e.message});
         console.log(e);
     }
 }

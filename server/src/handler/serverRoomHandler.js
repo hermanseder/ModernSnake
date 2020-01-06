@@ -76,6 +76,10 @@ class ServerRoomHandler {
         return undefined;
     }
 
+    getRoomNames() {
+        return Array.from(this._rooms.keys());
+    }
+
     getRooms(countPlayers) {
         const result = [];
         for (const [source, room] of this._rooms) {
@@ -95,6 +99,7 @@ class ServerRoomHandler {
         this._ioCommunication.emit(socketCommands.updateRooms2, this.getRooms(2));
         this._ioCommunication.emit(socketCommands.updateRooms3, this.getRooms(3));
         this._ioCommunication.emit(socketCommands.updateRooms4, this.getRooms(4));
+        this._ioCommunication.emit(socketCommands.updateRoomNames, this.getRoomNames());
     }
 
     _roomEndCallback(name) {

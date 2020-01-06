@@ -6,7 +6,6 @@ _ioCommunication: socketio;
 
 let GameModeSelectorHandler = (function () {
     /* Constants */
-    const _classContainerHidden = 'container-hidden';
     const _playgroundPath = 'pages/game/gamePlayground.html';
     const _selectedOption = 'option:selected';
     const _roomSelectedClass = 'room-selection-active';
@@ -34,6 +33,7 @@ let GameModeSelectorHandler = (function () {
     let _currentRoomsArray;
 
     let _currentSelectedRoom;
+    let _roomNames;
 
     /* External functions */
     function construct(socket) {
@@ -46,6 +46,7 @@ let GameModeSelectorHandler = (function () {
         _removeSocketListener();
 
         _initializeDomElements();
+        _loadRoomNames();
         _fillOptions();
         _initializeSocketListener();
 
@@ -67,6 +68,7 @@ let GameModeSelectorHandler = (function () {
     /* Internal functions */
     function _initializeSocketListener() {
         _ioCommunication.on(socketCommands.updateLevels, _fillLevels);
+        _ioCommunication.on(socketCommands.updateRoomNames, _updateRoomNames);
     }
 
     function _removeSocketListener() {
@@ -74,6 +76,7 @@ let GameModeSelectorHandler = (function () {
         _ioCommunication.removeAllListeners(socketCommands.updateRooms2);
         _ioCommunication.removeAllListeners(socketCommands.updateRooms3);
         _ioCommunication.removeAllListeners(socketCommands.updateRooms4);
+        _ioCommunication.removeAllListeners(socketCommands.updateRoomNames);
     }
 
     function _removeGameStartListener() {
@@ -137,6 +140,18 @@ let GameModeSelectorHandler = (function () {
             }
         }
         _updateRoomListener();
+    }
+
+    function _loadRoomNames() {
+        _ioCommunication.emit(socketCommands.getRoomNames, LoginHandler.getAuth(), function (data) {
+            if (data.success) {
+                _updateRoomNames(data.data);
+            }
+        });
+    }
+
+    function _updateRoomNames(data) {
+        _roomNames = data || [];
     }
 
     function _fillOptions() {
@@ -402,10 +417,9 @@ let GameModeSelectorHandler = (function () {
 
         if (_currentModeMultiPlayer) {
             const roomName = _getRoomName();
-            console.log(roomName);
             valid = valid && roomName !== undefined;
             valid = valid && roomName.length >= ModernSnakeConfig.minimumRoomLength;
-            valid = valid && _currentRoomsArray.indexOf(roomName) < 0;
+            valid = valid && _roomNames.indexOf(roomName) < 0;
         }
 
         return valid;

@@ -20,6 +20,9 @@ socketCommands = {
     updateRooms3: 'updateRooms3',
     updateRooms4: 'updateRooms4',
 
+    getRoomNames: 'roomNames',
+    updateRoomNames: 'updateRoomNames',
+
     getCurrentRoom2: 'getCurrentRoom2',
     getCurrentRoom3: 'getCurrentRoom3',
     getCurrentRoom4: 'getCurrentRoom4',
