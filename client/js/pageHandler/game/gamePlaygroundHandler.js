@@ -12,6 +12,10 @@ let GamePlaygroundHandler = (function () {
     const _appleColor = '#f44336';
     const _wallColor = '#5e4c46';
 
+    const _classScoreItem = '.game-score-item';
+    const _classScoreUser = '.game-score-user';
+    const _classScoreValue = '.game-score-value';
+
     /* Variables */
     let _ioCommunication;
     let _drawContext;
@@ -20,6 +24,7 @@ let GamePlaygroundHandler = (function () {
     let _gameRunning;
     let _currentMode;
     let _currentEndCallback;
+    let _gameScoreContainer;
 
     /* External functions */
 
@@ -35,6 +40,9 @@ let GamePlaygroundHandler = (function () {
         _currentEndCallback = endCallback;
         _gameFieldCanvas = document.getElementById(_gameFieldId);
         _drawContext = _gameFieldCanvas.getContext("2d");
+        _gameScoreContainer = $('#game-score-container');
+
+        _initializeScoreItems();
         _addListener();
         _resizeCanvas();
     }
@@ -43,16 +51,42 @@ let GamePlaygroundHandler = (function () {
         _ioCommunication.emit(socketCommands.leaveRoom, LoginHandler.getAuth());
         _removeListener();
         _drawGame(undefined);
+        if (_gameScoreContainer) _gameScoreContainer.empty();
     }
 
     /* Internal functions */
+
+    function _initializeScoreItems() {
+        _gameScoreContainer.empty();
+        if (_currentMode === ModernSnakeGameModes.onePlayer) {
+            _gameScoreContainer.append(' <div class="game-score-item"><div class="game-score-value">0</div></div>');
+        } else {
+            let count = 0;
+            switch (_currentMode) {
+                case ModernSnakeGameModes.twoPlayer:
+                    count = 2;
+                    break;
+                case ModernSnakeGameModes.threePlayer:
+                    count = 3;
+                    break;
+                case ModernSnakeGameModes.fourPlayer:
+                    count = 4;
+                    break;
+            }
+            for (let i = 0; i < count; i++) {
+                _gameScoreContainer.append(' <div class="game-score-item"><div class="game-score-user"></div> <div class="game-score-value">0</div></div>');
+            }
+        }
+    }
 
     function _addListener() {
         $(window).on('resize', _resizeCanvas);
         $(window).on('keyup', _keyboardEvent);
         // $(window).on('swipeleft', _swipeLeft);
 
-        $('body').bind('touchmove', function(e){e.preventDefault()})
+        $('body').bind('touchmove', function (e) {
+            e.preventDefault()
+        })
         $(_gameFieldCanvas).swipe({
             swipe: function (event, direction, distance, duration, fingerCount, fingerData) {
                 _swipeEvent(direction);
@@ -72,8 +106,8 @@ let GamePlaygroundHandler = (function () {
         if (gameData === undefined) return;
 
         _checkAfter(gameData.after);
-        // console.log(gameData);
         _drawGame(gameData);
+        _drawScore(gameData.game.snakes);
     }
 
     function _checkAfter(afterData) {
@@ -218,6 +252,25 @@ let GamePlaygroundHandler = (function () {
                 return _snakeColor4;
             default:
                 return '#ffffff';
+        }
+    }
+
+    function _drawScore(userData) {
+        const controls = _gameScoreContainer.find(_classScoreItem);
+        if (controls.length != userData.length) {
+            console.error('INVALID_DATA_LENGTH');
+            return;
+        }
+
+        for (let i = 0; i < userData.length; i++) {
+            const item = userData[i];
+            const control = $(controls.get(i));
+
+            const valueControl = control.find(_classScoreValue);
+            valueControl.text(item.score);
+
+            const user = control.find(_classScoreUser);
+            if (user) user.text(item.username);
         }
     }
 

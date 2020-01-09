@@ -357,19 +357,6 @@ h1, h2, h3, h4, h5, h6 {
     display: none;
 }
 
-#game-field {
-    background-color: #c5c1bb;
-    width: 80%;
-    display: block;
-    margin: 0 auto;
-}
-
-@media screen and (max-width: 600px) {
-    #game-field {
-        width: 100%;
-    }
-}
-
 .full-width-button {
     width: 100%;
 }
@@ -410,6 +397,86 @@ h1, h2, h3, h4, h5, h6 {
         display: none;
     }
 }
+
+.game-container {
+    margin: 0 auto;
+    width: 75%;
+}
+
+#game-field {
+    display: block;
+    width: 100%;
+    background-color: #c5c1bb;
+}
+
+@media screen and (max-width: 600px) {
+    .game-container {
+        width: 100%;
+    }
+}
+
+#game-score-container {
+    display: flex;
+    flex-direction: row;
+
+    width: 100%;
+    background-color: #c5c1bb;
+    color: #eff0eb;
+}
+
+.game-score-item {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    flex: 1;
+    height: 50px;
+}
+
+.game-score-item::before,
+.game-score-item::after {
+    position: absolute;
+    top: 0;
+
+    width: 15px;
+    height: 100%;
+
+    content: "";
+}
+
+.game-score-item::before {
+    left: 0;
+    background-color: greenyellow;
+}
+
+.game-score-item::after {
+    right: 0;
+    background-color: cornflowerblue;
+}
+
+.game-score-item:nth-child(1) {
+    background-color: #ee6e73;
+}
+
+.game-score-item:nth-child(2) {
+    background-color: #eacb48;
+}
+
+.game-score-item:nth-child(3) {
+    background-color: #26a69a;
+}
+
+.game-score-item:nth-child(4) {
+    background-color: #4caf50;
+}
+
+.game-score-value {
+    font-weight: 600;
+}
+
 
 /* SCORE */
 .parent-score-box {
