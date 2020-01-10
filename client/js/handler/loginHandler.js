@@ -17,6 +17,7 @@ const LoginHandler = (function () {
     function login(username, password) {
         _requestedUser = username;
         _passwordHash = _getPasswordHash(password);
+        _socketCommunication.connect();
 
         _socketCommunication.on(socketCommands.unauthorized, _unauthorizedHandler);
         _socketCommunication.on(socketCommands.loginRequest, _loginRequest);
@@ -32,6 +33,7 @@ const LoginHandler = (function () {
     function _logoutDone(result) {
         if (!result) return;
         if (result.success) {
+            _socketCommunication.disconnect();
             _currentUser = undefined;
             _currentToken = undefined;
             LoginUiHandler.loginLogoutSucceeds();
