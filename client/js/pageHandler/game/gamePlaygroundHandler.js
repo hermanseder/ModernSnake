@@ -177,7 +177,6 @@ let GamePlaygroundHandler = (function () {
     }
 
     function _drawGame(gameData) {
-        console.log('draw');
         if (!_drawContext) return;
 
         _drawBackground();

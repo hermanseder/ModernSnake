@@ -36,7 +36,10 @@ _gameData: {
     }
     after?: {
         remainingTime: number,
-        result: [string]
+        result: [{
+            rank: number,
+            username: string
+        }]
     }
 }
 
@@ -266,8 +269,15 @@ class ServerGame {
     }
 
     _updateResult(invalidUsers) {
+        const invalidLength = invalidUsers.length;
+        if (invalidLength <= 0) return;
+
+        const currentRank = this._players.size - this._gameData.after.result.length - invalidLength + 1;
         for (const user of invalidUsers) {
-            this._gameData.after.result.unshift(user);
+            this._gameData.after.result.push({
+                rank: currentRank,
+                username: user,
+            });
         }
     }
 
@@ -323,6 +333,18 @@ class ServerGame {
                 if (position.x !== invalidPosition.x) continue;
                 if (position.y !== invalidPosition.y) continue;
                 invalidUsers.push(username);
+                continue;
+            }
+        }
+        for (const user1 of snakePositions.keys()) {
+            for (const user2 of snakePositions.keys()) {
+                if (user1 === user2) continue;
+                if (snakePositions.get(user1).x !== snakePositions.get(user2).x) continue;
+                if (snakePositions.get(user1).y !== snakePositions.get(user2).y) continue;
+                if (invalidUsers.indexOf(user1) < 0) {
+                    invalidUsers.push(user1);
+                    continue;
+                }
             }
         }
         return invalidUsers;
@@ -429,9 +451,9 @@ class ServerGame {
     }
 
     _getSnakeBeginning(dimensions, playerNumber, startSize) {
-        const halfDimension = dimensions / 2;
-        const isVertical = dimensions % 2 === 0;
-        const start = playerNumber === 0 || playerNumber === 2 ? 0 : dimensions - startSize;
+        const halfDimension = Math.floor(dimensions / 2);
+        const isVertical = (playerNumber === 0 || playerNumber === 1);
+        const start = (playerNumber === 0 || playerNumber === 2) ? 0 : dimensions - startSize;
 
         const result = [];
         for (let i = 0; i < startSize; i++) {

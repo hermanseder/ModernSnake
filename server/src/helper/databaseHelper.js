@@ -98,7 +98,10 @@ async function _insertDummyDataAsync() {
 async function _sqlDummyDataUserAsync() {
     const users = [
         {username: 'rudi', password: 'pw'},
-        {username: 'geri', password: 'pw'}
+        {username: 'geri', password: 'pw'},
+        {username: 'bot1', password: 'pw'},
+        {username: 'bot2', password: 'pw'},
+        {username: 'bot3', password: 'pw'},
     ];
 
     const result = [];

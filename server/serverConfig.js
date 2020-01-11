@@ -10,7 +10,7 @@ module.exports = {
 
     gameInterval: 1000 / 10,
     gameAppleBaseDuration: 5000,
-    gameDimensions: 40,
+    gameDimensions: 39,
     gameBeforeTime: 3000,
     gameAfterTime: 5000,
     gameStartSize: 10,
