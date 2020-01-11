@@ -14,27 +14,28 @@ _currentGame: ServerGame;
 
 _roomEndCallback: function(name: string): boolean;
 
-_speedDegree: integer;
+_difficulty: integer;
 
  */
 
+const config = require(require.resolve('../../serverConfig.js'));
 const serverGameHandler = require(require.resolve('../handler/serverGameHandler'));
 
 class ServerRoom {
 
-    constructor(socket, name, level, countPlayers, speedDegree, roomEndCallback) {
+    constructor(socket, name, level, countPlayers, difficulty, roomEndCallback) {
         this._ioCommunication = socket;
         this._name = name;
         this._level = level;
         this._countPlayers = countPlayers;
         this._currentPlayers = new Map();
         this._currentGame = undefined;
-        this._speedDegree = speedDegree;
+        this._difficulty = difficulty;
         this._roomEndCallback = roomEndCallback;
     }
 
     getDifficulty() {
-        return this._speedDegree;
+        return this._difficulty;
     }
 
     getLevel() {
@@ -92,8 +93,9 @@ class ServerRoom {
     }
 
     _startGame() {
+        const speedDegree = this._getSpeedDegree(this._difficulty);
         this._currentGame = serverGameHandler.startGame(this._name, this._level, this._currentPlayers,
-            this._speedDegree, this._gameDoneCallback.bind(this));
+            speedDegree, this._gameDoneCallback.bind(this));
     }
 
     _gameDoneCallback() {
@@ -102,6 +104,19 @@ class ServerRoom {
             this.leaveRoom(playerId);
         }
         this._roomEndCallback(this._name);
+    }
+
+    _getSpeedDegree(difficulty) {
+        switch (difficulty) {
+            case 0:
+                return config.gameSnakeSpeed0;
+            case 1:
+                return config.gameSnakeSpeed1;
+            case 2:
+                return config.gameSnakeSpeed2;
+            default:
+                throw new Error('INVALID_DIFFICULTY');
+        }
     }
 }
 

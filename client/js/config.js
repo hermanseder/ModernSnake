@@ -35,13 +35,19 @@ ModernSnakeGameDirections = {
     directionDown: 'down',
     directionLeft: 'left',
     directionRight: 'right',
-}
+};
 
 ModernSnakeGameModes = {
     onePlayer: 1,
     twoPlayer: 2,
     threePlayer: 3,
     fourPlayer: 4,
+};
+
+ModernSnakeGameDifficulty = {
+    Difficulty0: "slug",
+    Difficulty1: "worm",
+    Difficulty2: "python",
 }
 
 

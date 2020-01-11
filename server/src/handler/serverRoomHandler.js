@@ -7,7 +7,6 @@ _rooms: [
 
  */
 
-const config = require(require.resolve('../../serverConfig.js'));
 const socketCommands = require(require.resolve('../../socketCommands'));
 const ServerRoom = require(require.resolve('../classes/serverRoom'));
 
@@ -23,11 +22,9 @@ class ServerRoomHandler {
     }
 
     createRoom(name, level, countPlayers, difficulty) {
-        const speedDegree = this._getSpeedDegree(difficulty);
-
         if (this.hasRoom(name)) throw new Error('NAME_ALREADY_USED');
         this._rooms.set(name, new ServerRoom(this._ioCommunication, name, level,
-            countPlayers, speedDegree, this._roomEndCallback.bind(this)));
+            countPlayers, difficulty, this._roomEndCallback.bind(this)));
         this._roomsUpdated();
     }
 
@@ -106,19 +103,6 @@ class ServerRoomHandler {
         if (this._rooms.has(name)) {
             this.closeRoom(name);
             this._roomsUpdated();
-        }
-    }
-
-    _getSpeedDegree(difficulty) {
-        switch (difficulty) {
-            case 0:
-                return config.gameSnakeSpeed0;
-            case 1:
-                return config.gameSnakeSpeed1;
-            case 2:
-                return config.gameSnakeSpeed2;
-            default:
-                throw new Error('INVALID_DIFFICULTY');
         }
     }
 }

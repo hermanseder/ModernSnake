@@ -200,7 +200,7 @@ let GameModeSelectorHandler = (function () {
         _selectGameDifficulty.append('<option value="" disabled selected>Choose difficulty</option>');
 
         for (let i = 0; i < difficulty.length; i++) {
-            _selectGameDifficulty.append('<option value="' + difficulty[i] + '">Difficulty ' + (difficulty[i] + 1) + '</option>');
+            _selectGameDifficulty.append('<option value="' + difficulty[i] + '">' + _getDifficultyFormatted(difficulty[i]) + '</option>');
         }
         _selectGameDifficulty.formSelect();
     }
@@ -397,7 +397,16 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _getDifficultyFormatted(difficulty) {
-        return 'Difficulty ' + difficulty;
+        switch (difficulty) {
+            case 0:
+                return ModernSnakeGameDifficulty.Difficulty0;
+            case 1:
+                return ModernSnakeGameDifficulty.Difficulty1;
+            case 2:
+                return ModernSnakeGameDifficulty.Difficulty2;
+            default:
+                return 'Difficulty 42';
+        }
     }
 
     function _getLevel() {
