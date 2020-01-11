@@ -378,13 +378,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .room-selection-active,
-.room-selection-row:hover {
+.room-selection-row:not(.room-selection-full):hover {
     transform: scale(1.02);
     background-color: #7e8883;
     color: #eff0eb;
 }
 
 .room-selection-active {
+    cursor: inherit;
+}
+
+.room-selection-full {
+    background-color: #eff0eb;
+    border: #7e8883 1px solid;
     cursor: inherit;
 }
 

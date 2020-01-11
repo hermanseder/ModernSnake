@@ -11,6 +11,7 @@ let GameModeSelectorHandler = (function () {
     const _roomSelectedClass = 'room-selection-active';
     const _dataRoomIdAttribute = 'data-room-id';
     const _roomSelectionRowClass = 'room-selection-row';
+    const _roomSelectionRowFullClass = 'room-selection-full';
 
     /* Variables */
     let _ioCommunication;
@@ -34,6 +35,7 @@ let GameModeSelectorHandler = (function () {
 
     let _currentSelectedRoom;
     let _roomNames;
+    let _currentRoomData;
 
     /* External functions */
     function construct(socket) {
@@ -129,6 +131,7 @@ let GameModeSelectorHandler = (function () {
             return;
         }
 
+        _currentRoomData = [...data];
         const elements = _roomSelectionContent.find('.' + _roomSelectionRowClass);
         for (let i = 0; i < elements.length; i++) {
             const currentElement = $(elements.get(i));
@@ -142,7 +145,12 @@ let GameModeSelectorHandler = (function () {
                 currentElement.find('.room-level').text(roomData.level);
                 currentElement.find('.room-difficulty').text(_getDifficultyFormatted(roomData.difficulty));
                 currentElement.find('.room-size').text(_getRoomSizeFormatted(roomData.size, roomData.remainingPlaces));
-                data.splice(roomIndex, 1)
+                if (roomData.remainingPlaces <= 0) {
+                    currentElement.addClass(_roomSelectionRowFullClass);
+                } else {
+                    currentElement.removeClass(_roomSelectionRowFullClass);
+                }
+                data.splice(roomIndex, 1);
             }
         }
         for (let i = 0; i < data.length; i++) {
@@ -268,6 +276,7 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _fillRooms(rooms) {
+        _currentRoomData = rooms;
         _roomSelectionContent.empty();
 
         for (let i = 0; i < rooms.length; i++) {
@@ -324,10 +333,14 @@ let GameModeSelectorHandler = (function () {
 
     function _joinRoom(source) {
         const roomId = GenericUiHandler.getAttribute($(source.delegateTarget), _dataRoomIdAttribute);
-        if (roomId === _currentSelectedRoom) return;
-
         if (roomId === undefined) {
             ErrorHandler.showErrorMessage('ROOM_ID_MISSING');
+            return;
+        }
+        if (roomId === _currentSelectedRoom) return;
+        for (let i = 0; i < _currentRoomData.length; i++) {
+            if (_currentRoomData[i].name !== roomId) continue;
+            if (_currentRoomData[i].remainingPlaces > 0) continue;
             return;
         }
 
@@ -369,7 +382,8 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _createRoomRow(roomData) {
-        let element = '<div class="' + _roomSelectionRowClass + ' row" ' + _dataRoomIdAttribute + '="' + roomData.name + '">';
+        const roomFullClass = (roomData.remainingPlaces <= 0) ? _roomSelectionRowFullClass : '';
+        let element = '<div class="' + _roomSelectionRowClass + ' row ' + roomFullClass + '" ' + _dataRoomIdAttribute + '="' + roomData.name + '">';
         element += '<div class="room-name col s12 m4">' + roomData.name + '</div>';
         element += '<div class="room-level col s12 m3">' + roomData.level + '</div>';
         element += '<div class="room-difficulty col s8 m3">' + _getDifficultyFormatted(roomData.difficulty) + '</div>';
@@ -379,7 +393,7 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _getRoomSizeFormatted(size, remainingPlaces) {
-        return (size - remainingPlaces) + ' | ' + size
+        return (remainingPlaces > 0) ? (size - remainingPlaces) + ' | ' + size : 'run';
     }
 
     function _getDifficultyFormatted(difficulty) {
