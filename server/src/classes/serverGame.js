@@ -230,9 +230,28 @@ class ServerGame {
         if (this._gameData.after.countdown <= 0) {
             this._gameData.after.countdown = 0;
             this._sendUpdateToUsers();
-            this._gameEndCallback(this._id);
+            this._gameEndCallback(this._id, this._level, this._gameSize, this._getGameStoreData());
             this._stopGameLoop();
         }
+    }
+
+    _getGameStoreData() {
+        const result = [];
+        for (const entry of this._gameData.after.result) {
+            const resultData = {
+                username: entry.username,
+                rank: entry.rank,
+                score: 0
+            };
+            for (const snakeEntry of this._gameData.game.snakes) {
+                if (snakeEntry.username === entry.username) {
+                    resultData.score = snakeEntry.score;
+                    break;
+                }
+            }
+            result.push(resultData);
+        }
+        return result;
     }
 
     _updatePhaseGame(delta) {

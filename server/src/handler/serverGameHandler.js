@@ -11,6 +11,8 @@ _games: [
  */
 
 const ServerGame = require(require.resolve('../classes/serverGame'));
+const databaseHelper = require(require.resolve('../helper/databaseHelper'));
+
 
 class ServerGameHandler {
 
@@ -24,7 +26,7 @@ class ServerGameHandler {
 
     startGame(id, level, players, speedDegree, gameDoneCallback) {
         const game = new ServerGame(this._ioCommunication, id, level, players, speedDegree,
-            this._gameEndCallback.bind(this));
+            this._gameEndCallbackAsync.bind(this));
         this._games.set(id, {
             gameInstance: game,
             endCallback: gameDoneCallback
@@ -41,8 +43,13 @@ class ServerGameHandler {
         }
     }
 
-    _gameEndCallback(id) {
+    async _gameEndCallbackAsync(id, level, gameSize, gameStoreData) {
         if (this._games.has(id)) {
+            try {
+                await databaseHelper.storeGameResultAsync(id, level, gameSize, gameStoreData);
+            } catch (e) {
+                console.error(e.message);
+            }
             this._games.get(id).endCallback();
             this._games.delete(id);
         }

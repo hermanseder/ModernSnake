@@ -221,11 +221,11 @@ function _joinRoom(auth, name, socket, callback) {
 function _initializeRooms() {
     serverRoomHandler.initialize(ioCommunication);
 
-    serverRoomHandler.createRoom('room 2 easy', 1, 2, 0);
-    serverRoomHandler.createRoom('room 2 normal', 1, 2, 1);
-    serverRoomHandler.createRoom('room 2 hard', 1, 2, 2);
-    serverRoomHandler.createRoom('room 3', 1, 3, 0);
-    serverRoomHandler.createRoom('room 4', 1, 4, 0);
+    serverRoomHandler.createRoom('room 2 easy', 'default level', 2, 0);
+    serverRoomHandler.createRoom('room 2 normal', 'default level', 2, 1);
+    serverRoomHandler.createRoom('room 2 hard', 'default level', 2, 2);
+    serverRoomHandler.createRoom('room 3', 'default level', 3, 0);
+    serverRoomHandler.createRoom('room 4', 'default level', 4, 0);
     //
     // const dummyData = {id: 'dummy'};
     // serverRoomHandler.joinRoom('room 2', dummyData);
