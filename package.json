@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js",
+    "startWatch": "nodemon app.js",
     "postinstall": ""
   },
   "author": "Hermanseder & Rieß",
@@ -22,6 +23,7 @@
     "sqlite3": "4.1.1"
   },
   "devDependencies": {
-    "js-polyfills": "^0.1.42"
+    "js-polyfills": "^0.1.42",
+    "nodemon": "^2.0.2"
   }
 }
