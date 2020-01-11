@@ -79,6 +79,7 @@ class ServerGame {
         this._speedDegree = speedDegree;
         this._gameEndCallback = gameEndCallback;
         this._gameLoopRunning = false;
+        this._gameSize = players.size;
     }
 
     startGame() {
@@ -101,6 +102,8 @@ class ServerGame {
         for (const [name, player] of this._players) {
             if (name === socketId) {
                 player.socket.removeAllListeners(socketCommands.gameMovement);
+                this._updateResult([player.username]);
+                this._disableInvalidUsers([player.username]);
             }
         }
     }
@@ -272,7 +275,7 @@ class ServerGame {
         const invalidLength = invalidUsers.length;
         if (invalidLength <= 0) return;
 
-        const currentRank = this._players.size - this._gameData.after.result.length - invalidLength + 1;
+        const currentRank = this._gameSize - this._gameData.after.result.length - invalidLength + 1;
         for (const user of invalidUsers) {
             this._gameData.after.result.push({
                 rank: currentRank,
