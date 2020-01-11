@@ -10,6 +10,7 @@ let GameModeSelectorHandler = (function () {
     const _selectedOption = 'option:selected';
     const _roomSelectedClass = 'room-selection-active';
     const _dataRoomIdAttribute = 'data-room-id';
+    const _roomSelectionRowClass = 'room-selection-row';
 
     /* Variables */
     let _ioCommunication;
@@ -30,7 +31,6 @@ let GameModeSelectorHandler = (function () {
     let _roomCreateButton;
 
     let _currentRooms;
-    let _currentRoomsArray;
 
     let _currentSelectedRoom;
     let _roomNames;
@@ -39,7 +39,6 @@ let GameModeSelectorHandler = (function () {
     function construct(socket) {
         _ioCommunication = socket;
         _currentModeMultiPlayer = false;
-        _currentRoomsArray = [];
     }
 
     function initialize(modeId) {
@@ -130,16 +129,35 @@ let GameModeSelectorHandler = (function () {
             return;
         }
 
-        for (let i = 0; i < data.length; i++) {
-            const roomName = data[i].name;
-            if (_currentRoomsArray.indexOf(roomName) >= 0) {
-                _updateRoomRow(data[i]);
+        const elements = _roomSelectionContent.find('.' + _roomSelectionRowClass);
+        for (let i = 0; i < elements.length; i++) {
+            const currentElement = $(elements.get(i));
+            const roomId = GenericUiHandler.getAttribute(currentElement, _dataRoomIdAttribute);
+
+            const roomIndex = _getIndexOfRoom(data, roomId);
+            if (roomIndex < 0) {
+                currentElement.remove();
             } else {
-                _roomSelectionContent.append(_createRoomRow(data[i]));
-                _currentRoomsArray.push(roomName);
+                const roomData = data[roomIndex];
+                currentElement.find('.room-level').text(roomData.level);
+                currentElement.find('.room-difficulty').text(_getDifficultyFormatted(roomData.difficulty));
+                currentElement.find('.room-size').text(_getRoomSizeFormatted(roomData.size, roomData.remainingPlaces));
+                data.splice(roomIndex, 1)
             }
         }
+        for (let i = 0; i < data.length; i++) {
+            _roomSelectionContent.append(_createRoomRow(data[i]));
+        }
+
         _updateRoomListener();
+    }
+
+    function _getIndexOfRoom(rooms, roomName) {
+        if (!roomName) return -1;
+        for (let i = 0; i < rooms.length; i++) {
+            if (rooms[i].name === roomName) return i;
+        }
+        return -1;
     }
 
     function _loadRoomNames() {
@@ -251,11 +269,9 @@ let GameModeSelectorHandler = (function () {
 
     function _fillRooms(rooms) {
         _roomSelectionContent.empty();
-        _currentRoomsArray = [];
 
         for (let i = 0; i < rooms.length; i++) {
             _roomSelectionContent.append(_createRoomRow(rooms[i]));
-            _currentRoomsArray.push(rooms[i].name);
         }
         _updateRoomListener();
         _loadCurrentRoom();
@@ -299,7 +315,7 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _updateRoomListener() {
-        _currentRooms = _roomSelectionContainer.find('.room-selection-row');
+        _currentRooms = _roomSelectionContainer.find('.' + _roomSelectionRowClass);
         _currentRooms.off('click');
 
         const activeRooms = _currentRooms.not('.' + _roomSelectedClass);
@@ -353,29 +369,13 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _createRoomRow(roomData) {
-        let element = '<div class="room-selection-row row" ' + _dataRoomIdAttribute + '="' + roomData.name + '">';
+        let element = '<div class="' + _roomSelectionRowClass + ' row" ' + _dataRoomIdAttribute + '="' + roomData.name + '">';
         element += '<div class="room-name col s12 m4">' + roomData.name + '</div>';
         element += '<div class="room-level col s12 m3">' + roomData.level + '</div>';
         element += '<div class="room-difficulty col s8 m3">' + _getDifficultyFormatted(roomData.difficulty) + '</div>';
         element += '<div class="room-size col s4 m1">' + _getRoomSizeFormatted(roomData.size, roomData.remainingPlaces) + '</div>';
         element += '</div>';
         return element;
-    }
-
-    function _updateRoomRow(roomData) {
-        let element = undefined;
-        _currentRooms.each(function () {
-            const roomId = GenericUiHandler.getAttribute($(this), _dataRoomIdAttribute);
-            if (roomId === roomData.name) {
-                element = $(this);
-                return;
-            }
-        });
-        if (element !== undefined) {
-            element.find('.room-level').text(roomData.level);
-            element.find('.room-difficulty').text(_getDifficultyFormatted(roomData.difficulty));
-            element.find('.room-size').text(_getRoomSizeFormatted(roomData.size, roomData.remainingPlaces));
-        }
     }
 
     function _getRoomSizeFormatted(size, remainingPlaces) {

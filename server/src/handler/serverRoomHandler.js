@@ -105,6 +105,7 @@ class ServerRoomHandler {
     _roomEndCallback(name) {
         if (this._rooms.has(name)) {
             this.closeRoom(name);
+            this._roomsUpdated();
         }
     }
 

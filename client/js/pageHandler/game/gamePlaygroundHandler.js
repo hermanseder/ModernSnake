@@ -105,9 +105,8 @@ let GamePlaygroundHandler = (function () {
     function _gameUpdate(gameData) {
         if (gameData === undefined) return;
 
-        _checkAfter(gameData.after);
         _drawGame(gameData);
-        _drawScore(gameData.game.snakes);
+        _checkAfter(gameData.after);
     }
 
     function _checkAfter(afterData) {
@@ -195,7 +194,7 @@ let GamePlaygroundHandler = (function () {
         _drawGameApple(segmentSize, gameData.game.apple);
 
         if (!gameData.running) {
-
+            _drawScore(gameData.game.snakes);
         }
     }
 
