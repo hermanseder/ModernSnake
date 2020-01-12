@@ -9,7 +9,7 @@ let GamePlaygroundHandler = (function () {
     const _backgroundColor = '#c5c1bb';
     const _snakeColor1 = '#ee6e73';
     const _snakeColor2 = '#eacb48';
-    const _snakeColor3 = '#26a69a';
+    const _snakeColor3 = '#2490a8';
     const _snakeColor4 = '#4caf50';
     const _appleColor = '#f44336';
     const _wallColor = '#5e4c46';
@@ -32,6 +32,7 @@ let GamePlaygroundHandler = (function () {
     let _currentMode;
     let _currentEndCallback;
     let _gameScoreContainer;
+    let _currentGameData;
 
     /* External functions */
 
@@ -62,7 +63,8 @@ let GamePlaygroundHandler = (function () {
     function stopGame() {
         _ioCommunication.emit(socketCommands.leaveRoom, LoginHandler.getAuth());
         _removeListener();
-        _drawGame(undefined);
+        _currentGameData = undefined;
+        _drawGame(_currentGameData);
         if (_gameScoreContainer) _gameScoreContainer.empty();
     }
 
@@ -137,6 +139,7 @@ let GamePlaygroundHandler = (function () {
     }
 
     function _gameUpdate(gameData) {
+        _currentGameData = gameData;
         if (gameData === undefined) return;
 
         _drawGame(gameData);
@@ -162,6 +165,7 @@ let GamePlaygroundHandler = (function () {
         $('#' + _gameFieldId).height(size);
         _gameFieldCanvas.height = size;
         _gameFieldCanvas.width = size;
+        _drawGame(_currentGameData);
     }
 
     function _keyboardEvent(event) {
@@ -225,10 +229,7 @@ let GamePlaygroundHandler = (function () {
             _drawGameSnake(i, segmentSize, gameData.game.snakes[i]);
         }
         _drawGameApple(segmentSize, gameData.game.apple);
-
-        if (!gameData.running) {
-            _drawScore(gameData.game.snakes);
-        }
+        _drawScore(gameData.game.snakes);
     }
 
     function _drawBackground() {
@@ -268,8 +269,7 @@ let GamePlaygroundHandler = (function () {
             const positionY = segmentSize * (segment.y);
 
             if (i === 0) {
-                _drawSnakeHead(spriteMap, snakeData, positionX, positionY, segmentSize);
-                continue;
+                _drawSnakeHead(spriteMap, snakeData, positionX, positionY, segmentSize, i);
             } else if (i === snakeLength - 1) {
                 _drawSnakeTail(spriteMap, snakeData, positionX, positionY, segmentSize, i);
             } else {
@@ -278,26 +278,28 @@ let GamePlaygroundHandler = (function () {
         }
     }
 
-    function _drawSnakeHead(spriteMap, snakeData, positionX, positionY, segmentSize) {
+    function _drawSnakeHead(spriteMap, snakeData, positionX, positionY, segmentSize, snakePosition) {
+        const previousSegment = snakeData.snake[snakePosition + 1];
+        const currentSegment = snakeData.snake[snakePosition];
         let tileX = 0;
         let tileY = 0;
-        switch (snakeData.direction) {
-            case ModernSnakeGameDirections.directionUp:
-                tileX = 3;
-                tileY = 0;
-                break;
-            case ModernSnakeGameDirections.directionRight:
-                tileX = 4;
-                tileY = 0;
-                break;
-            case ModernSnakeGameDirections.directionDown:
-                tileX = 4;
-                tileY = 1;
-                break;
-            case ModernSnakeGameDirections.directionLeft:
-                tileX = 3;
-                tileY = 1;
-                break;
+
+        if (currentSegment.y === (previousSegment.y - 1) || previousSegment.y < (currentSegment.y - 1)) {
+            // Up
+            tileX = 3;
+            tileY = 0;
+        } else if (previousSegment.x === (currentSegment.x - 1) || currentSegment.x < (previousSegment.x - 1)) {
+            // Right
+            tileX = 4;
+            tileY = 0;
+        } else if (previousSegment.y === (currentSegment.y - 1) || currentSegment.y < (previousSegment.y - 1)) {
+            // Down
+            tileX = 4;
+            tileY = 1;
+        } else if (currentSegment.x === (previousSegment.x - 1) || (previousSegment.x < (currentSegment.x - 1))) {
+            // Left
+            tileX = 3;
+            tileY = 1;
         }
         _drawSpriteMap(spriteMap, tileX, tileY, positionX, positionY, segmentSize);
     }
@@ -376,7 +378,6 @@ let GamePlaygroundHandler = (function () {
     }
 
     function _drawSnakeTail(spriteMap, snakeData, positionX, positionY, segmentSize, snakePosition) {
-        console.log(snakePosition);
         const nextSegment = snakeData.snake[snakePosition - 1];
         const currentSegment = snakeData.snake[snakePosition];
         let tileX = 0;
@@ -386,7 +387,7 @@ let GamePlaygroundHandler = (function () {
             // Up
             tileX = 3;
             tileY = 2;
-        } else if (currentSegment.x === (nextSegment.x  - 1) || nextSegment.x < (currentSegment.x - 1)) {
+        } else if (currentSegment.x === (nextSegment.x - 1) || nextSegment.x < (currentSegment.x - 1)) {
             // Right
             tileX = 4;
             tileY = 2;
