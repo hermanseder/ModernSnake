@@ -71,12 +71,13 @@ const {interval} = require('rxjs');
 
 class ServerGame {
 
-    constructor(socket, id, level, players, speedDegree, gameEndCallback) {
+    constructor(socket, id, level, players, speedDegree, difficulty, gameEndCallback) {
         this._ioCommunication = socket;
         this._id = id;
         this._level = level;
         this._players = players;
         this._speedDegree = speedDegree;
+        this._difficulty = difficulty;
         this._gameEndCallback = gameEndCallback;
         this._gameLoopRunning = false;
         this._gameSize = players.size;
@@ -230,7 +231,7 @@ class ServerGame {
         if (this._gameData.after.countdown <= 0) {
             this._gameData.after.countdown = 0;
             this._sendUpdateToUsers();
-            this._gameEndCallback(this._id, this._level, this._gameSize, this._getGameStoreData());
+            this._gameEndCallback(this._id, this._level, this._gameSize, this._difficulty, this._getGameStoreData());
             this._stopGameLoop();
         }
     }

@@ -36,4 +36,7 @@ socketCommands = {
     gameStart: 'gameStart',
     gameUpdate: 'gameUpdate',
     gameMovement: 'gameMovement',
+
+    loadScore: 'loadScore',
+    updateScore: 'updateScore'
 }

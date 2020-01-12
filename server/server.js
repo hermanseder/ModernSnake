@@ -56,6 +56,7 @@ function _initializeAuthentication() {
 
 function _initializeHandlers(socket, data) {
     _initializeHandlersGame(socket);
+    _initializeHandlerScore(socket);
 }
 
 /* GAME */
@@ -84,6 +85,10 @@ function _initializeHandlersGame(socket) {
     socket.on(socketCommands.getCurrentRoom4, (auth, callback) => _getCurrentRoom(4, auth, socket.id, callback));
 
     socket.on(socketCommands.joinRoom, (auth, name, callback) => _joinRoom(auth, name, socket, callback));
+}
+
+function _initializeHandlerScore(socket) {
+    socket.on(socketCommands.loadScore, _loadScore);
 }
 
 function _removeListener(socket) {
@@ -212,6 +217,19 @@ function _joinRoom(auth, name, socket, callback) {
         if (!requestHelper.checkRequestValid(auth)) throw new Error('AUTH_INVALID');
         serverRoomHandler.joinRoom(name, socket);
         callback({success: true});
+    } catch (e) {
+        console.log(e);
+        if (callback) callback({success: false, failure: e.message});
+    }
+}
+
+function _loadScore(auth, callback) {
+    try {
+        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUTH_INVALID');
+        // load data from database
+        databaseHelper.loadScoreDataAsync()
+            .then((data) => callback({success: true, result: data}))
+            .catch((e) => callback({success: false, failure: e.message}));
     } catch (e) {
         console.log(e);
         if (callback) callback({success: false, failure: e.message});

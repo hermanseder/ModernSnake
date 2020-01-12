@@ -98,7 +98,7 @@ const LoginHandler = (function () {
         console.log('current token: ' + _currentToken);
 
         // TODO REMOVE
-        // PageHandler.updatePath('game');
+        PageHandler.updatePath('score');
     }
 
     function _loginEnd() {

@@ -485,7 +485,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 /* SCORE */
-.parent-score-box {
+#parent-score-box {
     width: 100%;
     display: grid;
     margin-bottom: 1rem;
@@ -494,8 +494,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .child-score-box {
-    background-color: #484e4a;
-    color: #eff0eb;
+    background-color: #c5c1bb;
+    color:  #484e4a;
     padding-left: 1rem;
     text-align: center;
     border-radius: 5px;
@@ -506,11 +506,19 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 @media screen and (min-width: 600px) {
-    .parent-score-box {
+    #parent-score-box {
         grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(5, 1fr);
         grid-auto-flow: dense;
     }
+}
+
+.child-score-box-level {
+    width: 100%;
+    padding: 10px 0;
+    
+    font-weight: 600;
+    font-size: 1.4rem;
 }
 
 /* INPUTS */

@@ -10,15 +10,19 @@ const serverCryptoHelper = require(require.resolve('./serverCryptoHelper'));
 let database;
 let getPromise;
 
-
 // External functions
 async function initializeAsync() {
     const dbExists = _databaseExists();
-
-    database = new sqlite3.Database(config.databaseFile);
+    //create database
+    database = new sqlite3.Database(config.databaseFile, (err) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        console.log('Connected to the SQlite database.');
+      });
     getPromise = util.promisify(database.get);
     getPromise.call(database, 'PRAGMA foreign_keys = ON');
-
+    
     if (!dbExists) {
         _createTables();
         await _insertDummyDataAsync();
@@ -26,7 +30,13 @@ async function initializeAsync() {
 }
 
 function destroy() {
-    database.close();
+    //close database if no longer needed 
+    database.close((err) => {
+        if (err) {
+          return console.error(err.message);
+        }
+        console.log('SQLite database connection.');
+      });;
     database = undefined;
     getPromise = undefined;
 }
@@ -62,17 +72,17 @@ async function getLevelsAsync() {
     return ['default level'];
 }
 
-async function storeGameResultAsync(gameName, level, countUsers, userData) {
+async function storeGameResultAsync(gameName, level, countUsers, difficulty, userData) {
     try {
         database.serialize(async function () {
             const gameStatement = database.prepare(`
-                INSERT INTO game (name, countUser, level) values (?, ?, ?);
+                INSERT INTO game (name, countUser, level, difficulty) values (?, ?, ?, ?);
             `);
             const gameScoreStatement = database.prepare(`
                     INSERT INTO game_score (user_id, game_id, score, rank) VALUES(?, ?, ?, ?);
             `);
 
-            gameStatement.run(gameName, countUsers, level);
+            gameStatement.run(gameName, countUsers, level, difficulty);
             const result = await getPromise.call(database, 'SELECT last_insert_rowid() AS id;');
             const gameId = result['id'];
             if (!gameId) throw new Error('INSERT_GAME_FAILED');
@@ -87,6 +97,37 @@ async function storeGameResultAsync(gameName, level, countUsers, userData) {
     } catch (e) {
         throw new Error('INSERT_FAILED');
     }
+}
+
+async function loadScoreDataAsync() {
+return [
+    {
+        levelName: 'level 1',
+        scoreData: [
+            {
+                username: 'rudi',
+                score: 15,
+            },                    
+            {
+                username: 'geri',
+                score: 10,
+            }
+        ]
+    },
+    {
+        levelName: 'level 1',
+        scoreData: [
+            {
+                username: 'rudi',
+                score: 15,
+            },                    
+            {
+                username: 'geri',
+                score: 10,
+            }
+        ]
+    }
+];
 }
 
 // Internal functions
@@ -132,6 +173,7 @@ function _sqlTableGame() {
             name TEXT NOT NULL,
             countUser INTEGER NOT NULL,
             level TEXT NOT NULL,
+            difficulty INTEGER NOT NULL,
             CONSTRAINT fk_level
                 FOREIGN KEY (level)
                 REFERENCES level(name)
@@ -218,4 +260,5 @@ module.exports = {
     getPasswordAsync: getPasswordAsync,
     getLevelsAsync: getLevelsAsync,
     storeGameResultAsync: storeGameResultAsync,
+    loadScoreDataAsync: loadScoreDataAsync
 }

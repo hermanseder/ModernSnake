@@ -95,7 +95,7 @@ class ServerRoom {
     _startGame() {
         const speedDegree = this._getSpeedDegree(this._difficulty);
         this._currentGame = serverGameHandler.startGame(this._name, this._level, this._currentPlayers,
-            speedDegree, this._gameDoneCallback.bind(this));
+            speedDegree, this._difficulty, this._gameDoneCallback.bind(this));
     }
 
     _gameDoneCallback() {
