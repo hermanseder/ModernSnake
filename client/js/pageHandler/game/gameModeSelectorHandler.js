@@ -510,6 +510,7 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _loadPlayground() {
+        ContentHandler.closeSidebar();
         _levelSelectionContainer.hide();
         _roomSelectionContainer.hide();
         _playgroundContainer.empty();
