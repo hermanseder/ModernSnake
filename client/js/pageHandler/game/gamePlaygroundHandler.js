@@ -7,6 +7,8 @@ _spriteMap:[Image];
 let GamePlaygroundHandler = (function () {
     /* Constants */
     const _backgroundColor = '#c5c1bb';
+    const _textColor = '#eff0eb';
+    const _textBackgroundColor = '#9C9892';
     const _snakeColor1 = '#ee6e73';
     const _snakeColor2 = '#eacb48';
     const _snakeColor3 = '#2490a8';
@@ -223,21 +225,48 @@ let GamePlaygroundHandler = (function () {
         const currentSize = _gameFieldCanvas.width;
         const segmentSize = currentSize / gameData.dimension;
 
-        _drawGameBorder(currentSize, gameData.dimension, segmentSize);
         _drawGameWalls(segmentSize, gameData.game.walls);
         for (let i = 0; i < gameData.game.snakes.length; i++) {
             _drawGameSnake(i, segmentSize, gameData.game.snakes[i]);
         }
         _drawGameApple(segmentSize, gameData.game.apple);
+        _drawGameTextOverlay(gameData, currentSize);
         _drawScore(gameData.game.snakes);
+    }
+
+    function _drawGameTextOverlay(gameData, width) {
+        console.log(gameData.running);
+        if (gameData.running) return;
+
+        let text = '';
+        let time = '';
+        if (gameData.before.countdown > 0) {
+            text = 'Game starts in';
+            time = Math.round(gameData.before.countdown / 1000);
+        } else {
+            text = 'Leave game in';
+            console.log(gameData.after);
+            time = Math.round(gameData.after.countdown / 1000);
+        }
+
+        _drawContext.textBaseline = 'middle';
+        const halfWidth = Math.round((width / 2));
+        const textWith = _drawContext.measureText(text).width;
+        const timeWidth = _drawContext.measureText(time).width;
+
+        _drawContext.fillStyle = _textBackgroundColor;
+        _drawContext.fillRect(halfWidth - (textWith * 1.75 / 2), halfWidth - 40, textWith * 1.75, 80);
+
+        _drawContext.font = ModernSnakeConfig.gameTextStyle;
+        _drawContext.fillStyle = _textColor;
+
+        _drawContext.fillText(text, halfWidth - (textWith / 2), halfWidth - 15);
+        _drawContext.fillText(time, halfWidth - (timeWidth / 2), halfWidth + 20);
     }
 
     function _drawBackground() {
         _drawContext.fillStyle = _backgroundColor;
         _drawContext.fillRect(0, 0, _gameFieldCanvas.width, _gameFieldCanvas.height);
-    }
-
-    function _drawGameBorder(fieldSize, dimension, segmentSize) {
     }
 
     function _drawGameWalls(segmentSize, wallData) {

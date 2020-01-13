@@ -291,6 +291,7 @@ class ServerGame {
         const newPositions = this._getNewSnakePositions();
         if (newPositions.size <= 0) {
             this._phase = 2;
+            this._gameData.running = false;
             return;
         }
 

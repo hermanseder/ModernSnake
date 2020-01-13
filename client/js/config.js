@@ -8,6 +8,7 @@ ModernSnakeConfig = {
 
     maxPlayerCount: 4,
     spriteMapSize: 64,
+    gameTextStyle: '20px sans-serif'
 };
 
 ModernSnakeMessages = {
