@@ -235,7 +235,6 @@ let GamePlaygroundHandler = (function () {
     }
 
     function _drawGameTextOverlay(gameData, width) {
-        console.log(gameData.running);
         if (gameData.running) return;
 
         let text = '';
@@ -245,7 +244,6 @@ let GamePlaygroundHandler = (function () {
             time = Math.round(gameData.before.countdown / 1000);
         } else {
             text = 'Leave game in';
-            console.log(gameData.after);
             time = Math.round(gameData.after.countdown / 1000);
         }
 
