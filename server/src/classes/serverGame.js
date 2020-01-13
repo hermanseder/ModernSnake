@@ -333,7 +333,7 @@ class ServerGame {
             }
         }
 
-        this._appleAliveTime = (config.gameAppleBaseDuration * (1 + Math.random()));
+        this._appleAliveTime = (config.gameAppleBaseDuration * (this._speedDegree / 100) * (1 + Math.random()));
     }
 
     _updateApplesAndSnakeLength(newPositions) {
@@ -346,6 +346,7 @@ class ServerGame {
             if (apple !== undefined && apple.x === position.x && apple.y === position.y) {
                 entry.score++;
                 this._gameData.game.apple = undefined;
+                this._appleAliveTime = 0;
             } else {
                 entry.snake.pop();
             }
