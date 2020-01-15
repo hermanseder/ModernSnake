@@ -15,7 +15,7 @@ let PageScore = (function () {
         _parentScoreBox = $('#parent-score-box');
 
         // Initial load
-        _ioCommunication.emit(socketCommands.loadScore, LoginHandler.getAuth(), _updateScoreBoard);
+        _ioCommunication.emit(socketCommands.loadScore, LoginHandler.getAuth(), _loadScoreBoard);
 
         // Data update
         _ioCommunication.on(socketCommands.updateScore, _updateScoreBoard);
@@ -31,24 +31,28 @@ let PageScore = (function () {
     }
     
     /* Internal functions */
-    function _updateScoreBoard(data) {
+    function _loadScoreBoard(data) {
         if(!data.success) {
             ErrorHandler.showErrorMessage(data.failure);
             return;
         }
+        _updateScoreBoard(data.result);
+    }
 
-        const scoreData = data.result;
+    function _updateScoreBoard(scoreData) {
+        console.log(scoreData);
+
         _parentScoreBox.empty();
         console.log(scoreData);
         for (let i = 0; i < scoreData.length; i++) {
             _parentScoreBox.append(_createScoreBoardChild(scoreData[i]));
-        }
+        } 
     }
 
     function _createScoreBoardChild(data) {
         let htmlCode = '';
         htmlCode += _createTableBegin();
-        htmlCode += _createScoreChildHeader(data.levelName);
+        htmlCode += _createScoreChildHeader(data.name);
         htmlCode += _createScoreChildBody(data.scoreData);
         htmlCode += _createTableEnd();
         return htmlCode;
@@ -72,8 +76,7 @@ let PageScore = (function () {
         htmlCode += '<div class="child-score-box-level">' + levelName + '</div>'
         htmlCode += '<tr>'; 
         htmlCode += '<th>No.</th>'; 
-        htmlCode += '<th>Name</th>'; 
-        htmlCode += '<th>Name</th>'; 
+        htmlCode += '<th>Name</th>';
         htmlCode += '<th>Score</th>'; 
         htmlCode += '</tr>'; 
         return htmlCode;
@@ -84,8 +87,11 @@ let PageScore = (function () {
         
         let htmlCode = '';
         for (let i = 0; i < data.length; i++) {
-            htmlCode += (data[i].username);
-            // ...append
+            htmlCode += '<tr>';
+            htmlCode += '<td>' + (i + 1) + '.</td>';
+            htmlCode += '<td>' + data[i].username + '</td>';
+            htmlCode += '<td>' + data[i].score + '</td>';
+            htmlCode += '</tr>';
         }
         return htmlCode;
     }

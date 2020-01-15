@@ -44,10 +44,10 @@ class ServerGameHandler {
         }
     }
 
-    async _gameEndCallbackAsync(id, level, gameSize, gameStoreData) {
+    async _gameEndCallbackAsync(id, level, gameSize, difficulty, gameStoreData) {
         if (this._games.has(id)) {
             try {
-                await databaseHelper.storeGameResultAsync(id, level, gameSize, gameStoreData);
+                await databaseHelper.storeGameResultAsync(id, level, gameSize, difficulty, gameStoreData);
                 const scoreData = await databaseHelper.loadScoreDataAsync();
                 this._ioCommunication.emit(socketCommands.updateScore, scoreData);
             } catch (e) {

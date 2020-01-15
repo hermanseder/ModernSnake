@@ -9,6 +9,7 @@ const serverCryptoHelper = require(require.resolve('./serverCryptoHelper'));
 // Variables
 let database;
 let getPromise;
+let allPromise;
 
 // External functions
 async function initializeAsync() {
@@ -16,13 +17,14 @@ async function initializeAsync() {
     //create database
     database = new sqlite3.Database(config.databaseFile, (err) => {
         if (err) {
-          return console.error(err.message);
+            return console.error(err.message);
         }
         console.log('Connected to the SQlite database.');
-      });
+    });
     getPromise = util.promisify(database.get);
+    allPromise = util.promisify(database.all);
     getPromise.call(database, 'PRAGMA foreign_keys = ON');
-    
+
     if (!dbExists) {
         _createTables();
         await _insertDummyDataAsync();
@@ -33,10 +35,10 @@ function destroy() {
     //close database if no longer needed 
     database.close((err) => {
         if (err) {
-          return console.error(err.message);
+            return console.error(err.message);
         }
         console.log('SQLite database connection.');
-      });;
+    });;
     database = undefined;
     getPromise = undefined;
 }
@@ -74,7 +76,7 @@ async function getLevelsAsync() {
 
 async function storeGameResultAsync(gameName, level, countUsers, difficulty, userData) {
     try {
-        database.serialize(async function () {
+        await database.serialize(async function () {
             const gameStatement = database.prepare(`
                 INSERT INTO game (name, countUser, level, difficulty) values (?, ?, ?, ?);
             `);
@@ -82,7 +84,7 @@ async function storeGameResultAsync(gameName, level, countUsers, difficulty, use
                     INSERT INTO game_score (user_id, game_id, score, rank) VALUES(?, ?, ?, ?);
             `);
 
-            gameStatement.run(gameName, countUsers, level, difficulty);
+            await gameStatement.run(gameName, countUsers, level, difficulty);
             const result = await getPromise.call(database, 'SELECT last_insert_rowid() AS id;');
             const gameId = result['id'];
             if (!gameId) throw new Error('INSERT_GAME_FAILED');
@@ -91,7 +93,7 @@ async function storeGameResultAsync(gameName, level, countUsers, difficulty, use
                 const userId = await _getUserIdFromName(entry.username);
                 if (userId === undefined) throw new Error('USER_NOT_FOUND');
 
-                gameScoreStatement.run(userId, gameId, entry.score, entry.rank);
+                await gameScoreStatement.run(userId, gameId, entry.score, entry.rank);
             }
         });
     } catch (e) {
@@ -100,34 +102,30 @@ async function storeGameResultAsync(gameName, level, countUsers, difficulty, use
 }
 
 async function loadScoreDataAsync() {
-return [
-    {
-        levelName: 'level 1',
-        scoreData: [
-            {
-                username: 'rudi',
-                score: 15,
-            },                    
-            {
-                username: 'geri',
-                score: 10,
-            }
-        ]
-    },
-    {
-        levelName: 'level 1',
-        scoreData: [
-            {
-                username: 'rudi',
-                score: 15,
-            },                    
-            {
-                username: 'geri',
-                score: 10,
-            }
-        ]
+    const availableLevels = await allPromise.call(database, 'select name as name from level;');
+
+    const result = [];
+    const scoreStatement = database.prepare(`
+        select user.name as username, max(game_score.score) as score
+        from game_score
+            inner join game on game.id = game_score.game_id
+            inner join user on user.id = game_score.user_id
+        where game.level = ?
+        group by user.name
+        order by game_score.score DESC;
+    `); 
+    const allPreparedPromise = util.promisify(scoreStatement.all);
+
+    for (const levelResult of availableLevels) {
+        const levelName = levelResult.name;
+        const scoreData = await allPreparedPromise.call(scoreStatement, levelName);
+
+        if (scoreData.length > 0) {
+            result.push({name: levelName, scoreData: scoreData});
+        }
     }
-];
+
+    return result;
 }
 
 // Internal functions
@@ -144,7 +142,8 @@ function _createTables() {
         database.run(_sqlTableUser());
         database.run(_sqlTableLevel());
         database.run(_sqlTableGame());
-        database.run(_sqlTableGameScore());
+        database.run(_sqlTableGameScore());     // TO-DO CHECK IMPLEMENTATION   
+        database.run(_sqlCreateTableMatrix());  // TO-DO CHECK IMPLEMENTATION
     });
 }
 
@@ -200,6 +199,21 @@ function _sqlTableGameScore() {
     `;
 }
 
+function _sqlCreateTableMatrix() {
+    return `
+        CREATE TABLE Matrix(
+            id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            rowNr INTEGER NOT NULL, 
+            colNr INTEGER NOT NULL, 
+            value BOOLEAN, 
+            level TEXT NOT NULL, 
+            CONSTRAINT fk_level
+                FOREIGN KEY (level)
+                REFERENCES level(name)
+        ); 
+    `;
+}
+
 async function _insertDummyDataAsync() {
     const userData = await _sqlDummyDataUserAsync();
     const levelData = await _sqlDummyDataLevelAsync();
@@ -215,11 +229,11 @@ async function _insertDummyDataAsync() {
 
 async function _sqlDummyDataUserAsync() {
     const users = [
-        {username: 'rudi', password: 'pw'},
-        {username: 'geri', password: 'pw'},
-        {username: 'bot1', password: 'pw'},
-        {username: 'bot2', password: 'pw'},
-        {username: 'bot3', password: 'pw'},
+        { username: 'rudi', password: 'pw' },
+        { username: 'geri', password: 'pw' },
+        { username: 'bot1', password: 'pw' },
+        { username: 'bot2', password: 'pw' },
+        { username: 'bot3', password: 'pw' },
     ];
 
     const result = [];
@@ -250,7 +264,6 @@ async function _getUserIdFromName(username) {
     const result = await getPromise.call(gameStatement, username);
     return result ? result.id : undefined;
 }
-
 
 // Exports
 module.exports = {
