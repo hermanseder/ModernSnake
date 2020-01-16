@@ -332,6 +332,7 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _joinRoom(source) {
+        ContentHandler.closeSidebar();
         const roomId = GenericUiHandler.getAttribute($(source.delegateTarget), _dataRoomIdAttribute);
         if (roomId === undefined) {
             ErrorHandler.showErrorMessage('ROOM_ID_MISSING');
@@ -510,7 +511,6 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _loadPlayground() {
-        ContentHandler.closeSidebar();
         _levelSelectionContainer.hide();
         _roomSelectionContainer.hide();
         _playgroundContainer.empty();
