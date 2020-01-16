@@ -292,12 +292,16 @@ let GameModeSelectorHandler = (function () {
         }
     }
 
-    function _fillRooms(rooms) {
-        _currentRoomData = rooms;
+    function _fillRooms(result) {
+        if (!result.success) {
+            ErrorHandler.showErrorMessage(result.failure);
+            return;
+        }
+        _currentRoomData = result.data;
         _roomSelectionContent.empty();
 
-        for (let i = 0; i < rooms.length; i++) {
-            _roomSelectionContent.append(_createRoomRow(rooms[i]));
+        for (let i = 0; i < _currentRoomData.length; i++) {
+            _roomSelectionContent.append(_createRoomRow(_currentRoomData[i]));
         }
         _updateRoomListener();
         _loadCurrentRoom();
@@ -474,8 +478,10 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _singlePlayerStarted(result) {
-        // TODO show message
-        if (!result) console.error('Unable to start single player');
+        if (!result.success) {
+            ErrorHandler.showErrorMessage(result.failure);
+            return;
+        }
         _loadPlayground();
     }
 

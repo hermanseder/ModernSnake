@@ -12,6 +12,9 @@ let getPromise;
 let allPromise;
 let runPromise;
 
+// Constants
+const levelNames = ['Level 1', 'Level 2', 'Level 3'];
+
 // External functions
 async function initializeAsync() {
     try {
@@ -105,6 +108,7 @@ async function storeGameResultAsync(gameName, level, countUsers, difficulty, use
             }
         });
     } catch (e) {
+        console.log(e.message);
         throw new Error('INSERT_FAILED');
     }
 }
@@ -313,11 +317,10 @@ async function _sqlDummyDataUserAsync() {
 }
 
 async function _sqlDummyDataLevelAsync() {
-    const result = [
-        `INSERT INTO level (name) VALUES ('level 1');`,
-        `INSERT INTO level (name) VALUES ('level 2')`,
-        `INSERT INTO level (name) VALUES ('level 3')`
-    ];
+    const result = [];
+    for (const level of levelNames) {
+        result.push(`INSERT INTO level (name) VALUES ('${level}');`);
+    }
     return result;
 }
 
@@ -336,5 +339,7 @@ module.exports = {
     getPasswordAsync: getPasswordAsync,
     getLevelsAsync: getLevelsAsync,
     storeGameResultAsync: storeGameResultAsync,
-    loadScoreDataAsync: loadScoreDataAsync
+    loadScoreDataAsync: loadScoreDataAsync,
+
+    levelNames: levelNames
 }

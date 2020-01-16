@@ -115,7 +115,7 @@ function _logout(socket, auth, callback) {
             })
             .catch((error) => callback({success: false, failure: error.message}));
     } catch (e) {
-        if (callback) callback([]);
+        if (callback) callback({success: false, failure: error.message});
         console.log(e);
     }
 }
@@ -128,7 +128,7 @@ function _getDifficulty(auth, callback) {
         }
         callback({success: true, data: result});
     } catch (e) {
-        if (callback) callback({success: false, failure: error.message});
+        if (callback) callback({success: false, failure: e.message});
         console.log(e);
     }
 }
@@ -141,7 +141,7 @@ function _getLevels(auth, callback) {
             .then((result) => callback({success: true, data: result}))
             .catch((error) => callback({success: false, failure: error.message}));
     } catch (e) {
-        if (callback) callback({success: false, failure: error.message});
+        if (callback) callback({success: false, failure: e.message});
         console.log(e);
     }
 }
@@ -151,9 +151,9 @@ function _startSinglePlayer(auth, socket, difficulty, level, callback) {
         if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
         serverRoomHandler.createRoom(socket.id, level, 1, Number(difficulty));
         serverRoomHandler.joinRoom(socket.id, socket);
-        callback(true);
+        callback({success: true});
     } catch (e) {
-        if (callback) callback(false);
+        if (callback) callback({success: false, failure: e.message});
         console.log(e);
     }
 }
@@ -186,9 +186,9 @@ function _getRooms(size, auth, callback) {
         if (requestHelper.checkRequestValid(auth)) {
             result = serverRoomHandler.getRooms(size);
         }
-        callback(result);
+        callback({success: true, data: result});
     } catch (e) {
-        if (callback) callback([]);
+        if (callback) callback({success: false, failure: e.message});
         console.log(e);
     }
 }
@@ -244,14 +244,14 @@ function _loadScore(auth, callback) {
 function _initializeRooms() {
     serverRoomHandler.initialize(ioCommunication);
 
-    serverRoomHandler.createRoom('room 2 easy', 'default level', 2, 0);
-    serverRoomHandler.createRoom('room 2 normal', 'default level', 2, 1);
-    serverRoomHandler.createRoom('room 2 hard', 'default level', 2, 2);
-    serverRoomHandler.createRoom('room 3', 'default level', 3, 0);
-    serverRoomHandler.createRoom('room 4', 'default level', 4, 0);
-    //
-    // const dummyData = {id: 'dummy'};
-    // serverRoomHandler.joinRoom('room 2', dummyData);
+    for (let i = 0; i < databaseHelper.levelNames.length; i++) {
+        const levelName = databaseHelper.levelNames[i];
+        for (let j = 2; j <= 4; j++) {
+            serverRoomHandler.createRoom(`Room ${j} - ${i + 1} easy`, levelName, j, 0);
+            serverRoomHandler.createRoom(`Room ${j} - ${i + 1} normal`, levelName, j, 1);
+            serverRoomHandler.createRoom(`Room ${j} - ${i + 1} hard`, levelName, j, 2);
+        }
+    }
 }
 
 function _initializeGames() {
