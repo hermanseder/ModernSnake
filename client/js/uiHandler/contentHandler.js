@@ -129,5 +129,6 @@ const ContentHandler = (function () {
         closeUsermenu: closeUsermenu,
         openUsermenu: openUsermenu,
         setDefaultLocation: setDefaultLocation,
+        closeSidebar: closeSidebar,
     };
 })();

@@ -200,21 +200,24 @@ class ServerGame {
     }
 
     _updateGame(delta) {
+        let isDirty = false;
         switch (this._phase) {
             case 0: {
-                this._updatePhasePreparation(delta);
+                isDirty = this._updatePhasePreparation(delta);
                 break;
             }
             case 1: {
-                this._updatePhaseGame(delta);
+                isDirty = this._updatePhaseGame(delta);
                 break;
             }
             case 2: {
-                this._updatePhaseEnd(delta);
+                isDirty = this._updatePhaseEnd(delta);
                 break;
             }
         }
-        this._sendUpdateToUsers();
+        if (isDirty) {
+            this._sendUpdateToUsers();
+        }
     }
 
     _updatePhasePreparation(delta) {
@@ -224,6 +227,7 @@ class ServerGame {
             this._gameData.before = 0;
             this._phase = 1;
         }
+        return true;
     }
 
     _updatePhaseEnd(delta) {
@@ -234,6 +238,7 @@ class ServerGame {
             this._gameEndCallback(this._id, this._level, this._gameSize, this._difficulty, this._getGameStoreData());
             this._stopGameLoop();
         }
+        return true;
     }
 
     _getGameStoreData() {
@@ -256,17 +261,23 @@ class ServerGame {
     }
 
     _updatePhaseGame(delta) {
+        let isDirty = false;
+
         this._snakeMoveTime += delta;
         if (this._snakeMoveTime >= this._gameData.snakeSpeed) {
             this._setNewDirections();
             this._moveSnake();
             this._snakeMoveTime = 0;
+            isDirty = true;
         }
 
         this._appleAliveTime -= delta;
         if (this._appleAliveTime <= 0) {
             this._updateApple();
+            isDirty = true;
         }
+
+        return isDirty;
     }
 
     _setNewDirections() {
@@ -281,6 +292,7 @@ class ServerGame {
         const newPositions = this._getNewSnakePositions();
         if (newPositions.size <= 0) {
             this._phase = 2;
+            this._gameData.running = false;
             return;
         }
 
@@ -322,7 +334,7 @@ class ServerGame {
             }
         }
 
-        this._appleAliveTime = (config.gameAppleBaseDuration * (1 + Math.random()));
+        this._appleAliveTime = (config.gameAppleBaseDuration * (this._speedDegree / 100) * (1 + Math.random()));
     }
 
     _updateApplesAndSnakeLength(newPositions) {
@@ -335,6 +347,7 @@ class ServerGame {
             if (apple !== undefined && apple.x === position.x && apple.y === position.y) {
                 entry.score++;
                 this._gameData.game.apple = undefined;
+                this._appleAliveTime = 0;
             } else {
                 entry.snake.pop();
             }
