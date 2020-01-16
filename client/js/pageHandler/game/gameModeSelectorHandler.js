@@ -181,8 +181,16 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _fillOptions() {
-        _ioCommunication.emit(socketCommands.getLevels, LoginHandler.getAuth(), _fillLevels);
-        _ioCommunication.emit(socketCommands.getDifficulty, LoginHandler.getAuth(), _fillDifficulty);
+        _ioCommunication.emit(socketCommands.getLevels, LoginHandler.getAuth(), _fillLevelCallback);
+        _ioCommunication.emit(socketCommands.getDifficulty, LoginHandler.getAuth(), _fillDifficultyCallback);
+    }
+
+    function _fillLevelCallback(result) {
+        if (!result.success) {
+            ErrorHandler.showErrorMessage(result.failure);
+            return;
+        }
+        _fillLevels(result.data);
     }
 
     function _fillLevels(levels) {
@@ -190,9 +198,18 @@ let GameModeSelectorHandler = (function () {
         _selectGameLevel.append('<option value="" disabled selected>Choose level</option>');
 
         for (let i = 0; i < levels.length; i++) {
-            _selectGameLevel.append('<option value="' + levels[i] + '">' + levels[i] + '</option>');
+            const levelName = levels[i].name;
+            _selectGameLevel.append('<option value="' + levelName + '">' + levelName + '</option>');
         }
         _selectGameLevel.formSelect();
+    }
+
+    function _fillDifficultyCallback(result) {
+        if (!result.success) {
+            ErrorHandler.showErrorMessage(result.failure);
+            return;
+        }
+        _fillDifficulty(result.data);
     }
 
     function _fillDifficulty(difficulty) {

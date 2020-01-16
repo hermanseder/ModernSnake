@@ -36,7 +36,7 @@ let PageScore = (function () {
             ErrorHandler.showErrorMessage(data.failure);
             return;
         }
-        _updateScoreBoard(data.result);
+        _updateScoreBoard(data.data);
     }
 
     function _updateScoreBoard(scoreData) {

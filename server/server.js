@@ -25,14 +25,19 @@ let ioCommunication;
 
 // External functions
 async function startServerAsync(server) {
-    await databaseHelper.initializeAsync();
+    try {
+        await databaseHelper.initializeAsync();
 
-    ioCommunication = socketIO.listen(server);
-    _initializeSocket();
-    _initializeAuthentication();
+        ioCommunication = socketIO.listen(server);
+        _initializeSocket();
+        _initializeAuthentication();
 
-    _initializeGames();
-    _initializeRooms();
+        _initializeGames();
+        _initializeRooms();
+    } catch (e) {
+        console.error(e.message);
+        throw e;
+    }
 }
 
 function stopServer() {
@@ -62,7 +67,7 @@ function _initializeHandlers(socket, data) {
 /* GAME */
 
 function _initializeHandlersGame(socket) {
-    socket.on(socketCommands.logout, (auth, callback) =>  _logout(socket, auth, callback));
+    socket.on(socketCommands.logout, (auth, callback) => _logout(socket, auth, callback));
 
     socket.on(socketCommands.getDifficulty, _getDifficulty);
     socket.on(socketCommands.getLevels, _getLevels);
@@ -121,9 +126,9 @@ function _getDifficulty(auth, callback) {
         if (requestHelper.checkRequestValid(auth)) {
             result = config.gameDifficulty;
         }
-        callback(result);
+        callback({success: true, data: result});
     } catch (e) {
-        if (callback) callback([]);
+        if (callback) callback({success: false, failure: error.message});
         console.log(e);
     }
 }
@@ -133,10 +138,10 @@ function _getLevels(auth, callback) {
         if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
 
         databaseHelper.getLevelsAsync()
-            .then((result) => callback(result))
-            .catch(() => callback([]));
+            .then((result) => callback({success: true, data: result}))
+            .catch((error) => callback({success: false, failure: error.message}));
     } catch (e) {
-        if (callback) callback([]);
+        if (callback) callback({success: false, failure: error.message});
         console.log(e);
     }
 }
@@ -228,7 +233,7 @@ function _loadScore(auth, callback) {
         if (!requestHelper.checkRequestValid(auth)) throw new Error('AUTH_INVALID');
         // load data from database
         databaseHelper.loadScoreDataAsync()
-            .then((data) => callback({success: true, result: data}))
+            .then((data) => callback({success: true, data: data}))
             .catch((e) => callback({success: false, failure: e.message}));
     } catch (e) {
         console.log(e);
