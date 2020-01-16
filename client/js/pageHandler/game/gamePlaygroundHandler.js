@@ -62,8 +62,8 @@ let GamePlaygroundHandler = (function () {
         _resizeCanvas();
     }
 
-    function stopGame() {
-        _ioCommunication.emit(socketCommands.leaveRoom, LoginHandler.getAuth());
+    function stopGame(sendEvent = true) {
+        if (sendEvent) _ioCommunication.emit(socketCommands.leaveRoom, LoginHandler.getAuth());
         _removeListener();
         _currentGameData = undefined;
         _drawGame(_currentGameData);
@@ -153,7 +153,7 @@ let GamePlaygroundHandler = (function () {
 
         const remainingTime = afterData.countdown;
         if (remainingTime === undefined || remainingTime <= 0) {
-            stopGame();
+            stopGame(false);
             _currentEndCallback();
         }
     }
