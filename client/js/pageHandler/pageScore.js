@@ -40,10 +40,7 @@ let PageScore = (function () {
     }
 
     function _updateScoreBoard(scoreData) {
-        console.log(scoreData);
-
         _parentScoreBox.empty();
-        console.log(scoreData);
         for (let i = 0; i < scoreData.length; i++) {
             _parentScoreBox.append(_createScoreBoardChild(scoreData[i]));
         } 
@@ -83,8 +80,6 @@ let PageScore = (function () {
     }
 
     function _createScoreChildBody(data) {
-        console.log(data);
-        
         let htmlCode = '';
         for (let i = 0; i < data.length; i++) {
             htmlCode += '<tr>';
