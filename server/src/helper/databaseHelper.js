@@ -126,7 +126,8 @@ async function loadScoreDataAsync() {
                     INNER JOIN user ON user.id = game_score.user_id
                 WHERE game.level = ? AND game_score.score > 0
                     GROUP BY user.name
-                    ORDER BY game_score.score DESC;
+                    ORDER BY game_score.score DESC
+                LIMIT ${config.maxScoreResult};
                 `);
             const allPreparedPromise = util.promisify(scoreStatement.all);
 
