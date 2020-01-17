@@ -124,7 +124,7 @@ async function loadScoreDataAsync() {
                 FROM game_score
                     INNER JOIN game ON game.id = game_score.game_id
                     INNER JOIN user ON user.id = game_score.user_id
-                WHERE game.level = ?
+                WHERE game.level = ? AND game_score.score > 0
                     GROUP BY user.name
                     ORDER BY game_score.score DESC;
                 `);
@@ -134,11 +134,11 @@ async function loadScoreDataAsync() {
                 const levelName = levelResult.name;
                 const scoreData = await allPreparedPromise.call(scoreStatement, levelName);
 
-                if (scoreData.length > 0) {
+                if (scoreData.length > 0) {    
                     result.push({name: levelName, scoreData: scoreData});
                 }
             }
-
+            
             return result;
         });
     } catch (e) {
