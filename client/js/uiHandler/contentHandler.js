@@ -10,6 +10,10 @@ const ContentHandler = (function () {
     let mainTitle;
     let mainContent;
 
+    let sidebarLocked;
+
+    const sideBarLockedClass = 'sidebar-controller-locked';
+
     /* Init */
     function initialize(socket) {
         mainTitle = $('#main-title');
@@ -42,9 +46,9 @@ const ContentHandler = (function () {
 
     function sidebarToggleClick() {
         if (_isSidebarOpen()) {
-            sidebar.removeClass('sidebar-open');
+            closeSidebar();
         } else {
-            sidebar.addClass('sidebar-open');
+            openSidebar();
         }
     }
 
@@ -54,8 +58,18 @@ const ContentHandler = (function () {
         }
     }
 
+    function lockSidebar() {
+        sidebarLocked = true;
+        sidebar.addClass(sideBarLockedClass);
+    }
+
+    function unlockSidebar() {
+        sidebarLocked = false;
+        sidebar.removeClass(sideBarLockedClass);
+    }
+
     function openSidebar() {
-        if (!_isSidebarOpen()) {
+        if (!sidebarLocked && !_isSidebarOpen()) {
             sidebar.addClass('sidebar-open');
         }
     }
@@ -130,5 +144,7 @@ const ContentHandler = (function () {
         openUsermenu: openUsermenu,
         setDefaultLocation: setDefaultLocation,
         closeSidebar: closeSidebar,
+        lockSidebar: lockSidebar,
+        unlockSidebar: unlockSidebar
     };
 })();

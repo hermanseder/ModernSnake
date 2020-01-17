@@ -146,9 +146,13 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
 }
 
-.sidebar-controller:hover,
+.sidebar:not(.sidebar-controller-locked) > .sidebar-controller:hover,
 .sidebar-element:hover {
     background-color: #c5c1bb;
+}
+
+.sidebar-controller-locked > .sidebar-controller > a {
+    cursor: inherit;
 }
 
 .sidebar-controller .sidebar-icon {

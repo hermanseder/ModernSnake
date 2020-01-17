@@ -60,6 +60,7 @@ let GameModeSelectorHandler = (function () {
 
     function destroy() {
         _currentMode = -1;
+        ContentHandler.unlockSidebar();
         _removeModeListener();
         _removeSocketListener();
         _removeGameStartListener();
@@ -276,6 +277,7 @@ let GameModeSelectorHandler = (function () {
 
     function _loadAvailableRooms() {
         let command = undefined;
+        ContentHandler.unlockSidebar();
         switch (_currentMode) {
             case ModernSnakeGameModes.twoPlayer:
                 command = socketCommands.getRooms2;
@@ -471,6 +473,7 @@ let GameModeSelectorHandler = (function () {
     function _startSinglePlayer() {
         if (!_isInputValid()) return;
 
+        ContentHandler.closeSidebar();
         const level = _getLevel();
         const difficulty = _getDifficulty();
         _ioCommunication.emit(socketCommands.startSinglePlayer, LoginHandler.getAuth(),
@@ -534,6 +537,8 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _loadPlayground() {
+        ContentHandler.closeSidebar();
+        ContentHandler.lockSidebar();
         _levelSelectionContainer.hide();
         _roomSelectionContainer.hide();
         _playgroundContainer.empty();
@@ -547,6 +552,7 @@ let GameModeSelectorHandler = (function () {
 
     function _gameEndCallback() {
         _currentSelectedRoom = undefined;
+        ContentHandler.unlockSidebar();
         _playgroundContainer.hide();
         _playgroundContainer.empty();
         _levelSelectionContainer.show();
