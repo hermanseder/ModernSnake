@@ -342,17 +342,7 @@ h1, h2, h3, h4, h5, h6 {
     grid-column-gap: 10px;
 }
 
-.spacer {
-    flex: 1;
-}
-
-#keyboard-description {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-}
-
-#game-board-img {
+.description-img {
     display: block;
     width: 80%; 
     margin: auto;
