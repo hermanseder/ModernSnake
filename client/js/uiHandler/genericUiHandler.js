@@ -26,7 +26,9 @@ const GenericUiHandler = (function () {
     function resetMaterialInput(element, value = '') {
         element.val(value);
         element.removeClass('valid');
-        element.next().removeClass('active');
+        if (value === '') {
+            element.next().removeClass('active');
+        }
     }
 
     /* Exports */

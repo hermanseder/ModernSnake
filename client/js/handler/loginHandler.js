@@ -41,17 +41,17 @@ const LoginHandler = (function () {
     }
 
     function autoLogout() {
-        _logoutDone({success: true});
+        _logoutDone({success: true}, true);
     }
 
-    function _logoutDone(result) {
+    function _logoutDone(result, isAutoLogout = false) {
         if (!result) return;
         if (result.success) {
             _socketCommunication.disconnect();
             _currentUser = undefined;
             _currentToken = undefined;
             StorageHandler.resetToken();
-            StorageHandler.resetUsername();
+            if (!isAutoLogout) StorageHandler.resetUsername();
             LoginUiHandler.loginLogoutSucceeds();
         } else {
             ErrorHandler.showErrorMessage(result.failure);
@@ -112,10 +112,6 @@ const LoginHandler = (function () {
         LoginUiHandler.loginLogoutSucceeds(_currentUser);
         ContentHandler.closeUsermenu();
         _loginEnd();
-        console.log('current token: ' + _currentToken);
-
-        // TODO REMOVE
-        // PageHandler.updatePath('game');
     }
 
     function _loginEnd() {
