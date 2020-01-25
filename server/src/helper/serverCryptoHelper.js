@@ -54,6 +54,19 @@ async function isRequestTokenValidAsync(token, username) {
     return jwtData.username === username;
 }
 
+async function isTokenValidAsync(token, result) {
+    let jwtData;
+    try {
+        jwtData = await _getTokenDataAsync(token);
+    } catch (e) {
+        return false;
+    }
+
+    if (result) {
+        result.username = jwtData.username;
+    }
+    return true;
+}
 
 // Internal functions
 async function _getTokenDataAsync(token) {
@@ -80,5 +93,6 @@ module.exports = {
     generateDummySaltAsync: generateDummySaltAsync,
     generatePasswordHash: generatePasswordHashAsync,
     generateJsonWebToken: generateJsonWebTokenAsync,
-    isRequestTokenValidAsync: isRequestTokenValidAsync
+    isRequestTokenValidAsync: isRequestTokenValidAsync,
+    isTokenValidAsync: isTokenValidAsync
 };

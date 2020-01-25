@@ -2,12 +2,11 @@
 const socket = io();
 
 $(document).on('ready', function () {
-    // SocketHandler.initialize(socket);
+    StorageHandler.initialize();
     LoginHandler.initialize(socket);
 
     LoginUiHandler.initialize();
     ContentHandler.initialize(socket);
 
-    // TODO REMOVE
-    // LoginHandler.login('rudi', 'pw');
+    LoginHandler.checkAutoLogin();
 });

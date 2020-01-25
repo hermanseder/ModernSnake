@@ -53,6 +53,14 @@ class ServerLoginHandler {
         return token;
     }
 
+    async loginAutoAsync(source, username, token) {
+        if (this._hasLoggedIn(username)) throw new Error('ALREADY_LOGGED_IN');
+        this._loggedInUsers.set(username, {
+            token: token,
+            source: source
+        });
+    }
+
     async logoutAsync(username) {
         if (this._hasLoggedIn(username)) {
             this._loggedInUsers.delete(username);
