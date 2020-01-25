@@ -43,12 +43,12 @@ async function generateJsonWebTokenAsync(data) {
     );
 }
 
-async function isRequestTokenValidAsync(token, username) {
+async function isRequestTokenValidAsync(token, username, timeStamp) {
     let jwtData;
     try {
         jwtData = await _getTokenDataAsync(token);
     } catch (e) {
-        return false;
+        return _checkExpiredError(e, timeStamp);
     }
 
     return jwtData.username === username;
@@ -72,12 +72,16 @@ async function isTokenValidAsync(token, result) {
 async function _getTokenDataAsync(token) {
     if (token === undefined) throw new Error('TOKEN_INVALID');
 
-    try {
-        const verifyPromise = util.promisify(jwt.verify);
-        return await verifyPromise.call(jwt, token, config.jsonWebTokenSecret);
-    } catch (e) {
-        throw new Error('TOKEN_INVALID');
-    }
+    const verifyPromise = util.promisify(jwt.verify);
+    return await verifyPromise.call(jwt, token, config.jsonWebTokenSecret);
+}
+
+function _checkExpiredError(error, timeStamp) {
+    if (!error) return false;
+    if (!timeStamp) return false;
+    if (error.name != 'TokenExpiredError') return false;
+    if (error.expiredAt < timeStamp) return false;
+    return true;
 }
 
 async function _getBcryptVersionAsync() {

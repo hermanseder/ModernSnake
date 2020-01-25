@@ -173,6 +173,8 @@ let GameModeSelectorHandler = (function () {
         _ioCommunication.emit(socketCommands.getRoomNames, LoginHandler.getAuth(), function (data) {
             if (data.success) {
                 _updateRoomNames(data.data);
+            } else {
+                ErrorHandler.showErrorMessage(data.failure);
             }
         });
     }
@@ -329,7 +331,10 @@ let GameModeSelectorHandler = (function () {
 
     function _updateCurrentRoom(data) {
         if (!data) return;
-        if (!data.success) return;
+        if (!data.success) {
+            ErrorHandler.showErrorMessage(data.failure);
+            return;
+        }
         if (!data.data) return;
 
         _currentSelectedRoom = data.data;
@@ -542,11 +547,9 @@ let GameModeSelectorHandler = (function () {
         _levelSelectionContainer.hide();
         _roomSelectionContainer.hide();
         _playgroundContainer.empty();
-        // _roomSelectionContainer.hide();
         _playgroundContainer.load(_playgroundPath, undefined, function () {
             _playgroundContainer.show();
             GamePlaygroundHandler.startGame(_currentMode, _gameEndCallback);
-            // tabContent.fadeIn('fast');
         });
     }
 
