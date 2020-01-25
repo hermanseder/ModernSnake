@@ -19,6 +19,7 @@ const LoginHandler = (function () {
         if (!sessionToken) return;
 
         _requestReceived = true;
+        _socketCommunication.on(socketCommands.unauthorized, _unauthorizedHandler);
         _socketCommunication.on(socketCommands.loginSucceeded, _loginSucceeded);
         _socketCommunication.emit(socketCommands.authentication, {token: sessionToken});
     }
@@ -39,6 +40,10 @@ const LoginHandler = (function () {
         _socketCommunication.emit(socketCommands.logout, getAuth(), _logoutDone);
     }
 
+    function autoLogout() {
+        _logoutDone({success: true});
+    }
+
     function _logoutDone(result) {
         if (!result) return;
         if (result.success) {
@@ -54,7 +59,6 @@ const LoginHandler = (function () {
     }
 
     function isLoggedIn() {
-        console.log(_currentUser);
         return _currentUser !== undefined;
     }
 
@@ -148,6 +152,7 @@ const LoginHandler = (function () {
         checkAutoLogin: checkAutoLogin,
         login: login,
         logout: logout,
+        autoLogout: autoLogout,
         isLoggedIn: isLoggedIn,
         getAuth: getAuth,
     };

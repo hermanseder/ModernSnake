@@ -5,7 +5,21 @@ const ErrorHandler = (function () {
     }
     
     function showErrorMessage(errorMessage) {
-        console.error(errorMessage);
+        if (!_checkSpecialMessages(errorMessage)) {
+            _showMessage(errorMessage);
+        }
+    }
+
+    function _checkSpecialMessages(errorMessage) {
+        if (errorMessage === ModernSnakeMessages.tokenInvalid) {
+            LoginHandler.autoLogout();
+            return true;
+        }
+        return false;
+    }
+
+    function _showMessage(message) {
+        console.error(message);
     }
 
     /* Exports */

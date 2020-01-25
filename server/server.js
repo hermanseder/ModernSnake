@@ -104,9 +104,23 @@ function _removeListener(socket) {
     }
 }
 
-function _logout(socket, auth, callback) {
+function _callWrapper(auth, socketCallback, functionCallback) {
     try {
-        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
+        requestHelper.checkRequestValidAsync(auth).then((valid) => {
+            if (valid) {
+                functionCallback();
+            } else {
+                if (socketCallback) socketCallback({success: false, failure: config.tokenInvalid});
+            }
+        });
+    } catch (e) {
+        if (socketCallback) socketCallback({success: false, failure: error.message});
+        console.log(e);
+    }
+}
+
+function _logout(socket, auth, callback) {
+    _callWrapper(auth, callback, () => {
         serverRoomHandler.leaveRoom(socket.id);
         serverLoginHandler.logoutAsync(socket.username)
             .then(() => {
@@ -114,131 +128,75 @@ function _logout(socket, auth, callback) {
                 callback({success: true})
             })
             .catch((error) => callback({success: false, failure: error.message}));
-    } catch (e) {
-        if (callback) callback({success: false, failure: error.message});
-        console.log(e);
-    }
+    });
 }
 
 function _getDifficulty(auth, callback) {
-    try {
-        let result = [];
-        if (requestHelper.checkRequestValid(auth)) {
-            result = config.gameDifficulty;
-        }
-        callback({success: true, data: result});
-    } catch (e) {
-        if (callback) callback({success: false, failure: e.message});
-        console.log(e);
-    }
+    _callWrapper(auth, callback, () => {
+        callback({success: true, data: config.gameDifficulty});
+    });
 }
 
 function _getLevels(auth, callback) {
-    try {
-        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
-
+    _callWrapper(auth, callback, () => {
         databaseHelper.getLevelsAsync()
             .then((result) => callback({success: true, data: result}))
             .catch((error) => callback({success: false, failure: error.message}));
-    } catch (e) {
-        if (callback) callback({success: false, failure: e.message});
-        console.log(e);
-    }
+    });
 }
 
 function _startSinglePlayer(auth, socket, difficulty, level, callback) {
-    try {
-        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
+    _callWrapper(auth, callback, () => {
         serverRoomHandler.createRoom(socket.id, level, 1, Number(difficulty));
         serverRoomHandler.joinRoom(socket.id, socket);
         callback({success: true});
-    } catch (e) {
-        if (callback) callback({success: false, failure: e.message});
-        console.log(e);
-    }
+    });
 }
 
 function _leaveRoom(auth, socketId) {
-    try {
-        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUHT_INVALID');
+    _callWrapper(auth, undefined, () => {
         serverRoomHandler.leaveRoom(socketId);
-    } catch (e) {
-        console.log(e);
-    }
+    });
 }
 
 function _getRoomNames(auth, callback) {
-    try {
-        let result = [];
-        if (requestHelper.checkRequestValid(auth)) {
-            result = serverRoomHandler.getRoomNames();
-        }
-        callback({success: true, data: result});
-    } catch (e) {
-        if (callback) callback({success: false, failure: e.message});
-        console.log(e);
-    }
+    _callWrapper(auth, callback, () => {
+        callback({success: true, data: serverRoomHandler.getRoomNames()});
+    });
 }
 
 function _getRooms(size, auth, callback) {
-    try {
-        let result = [];
-        if (requestHelper.checkRequestValid(auth)) {
-            result = serverRoomHandler.getRooms(size);
-        }
-        callback({success: true, data: result});
-    } catch (e) {
-        if (callback) callback({success: false, failure: e.message});
-        console.log(e);
-    }
+    _callWrapper(auth, callback, () => {
+        callback({success: true, data: serverRoomHandler.getRooms(size)});
+    });
 }
 
 function _getCurrentRoom(size, auth, socketId, callback) {
-    try {
-        let result = undefined;
-        if (requestHelper.checkRequestValid(auth)) {
-            result = serverRoomHandler.getCurrentRoom(size, socketId);
-        }
-        callback({success: true, data: result});
-    } catch (e) {
-        if (callback) callback({success: false, failure: e.message});
-        console.log(e);
-    }
+    _callWrapper(auth, callback, () => {
+        callback({success: true, data: serverRoomHandler.getCurrentRoom(size, socketId)});
+    });
 }
 
 function _createRoom(auth, roomName, level, difficulty, countPlayers, callback) {
-    try {
-        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUTH_INVALID');
+    _callWrapper(auth, callback, () => {
         serverRoomHandler.createRoom(roomName, level, countPlayers, Number(difficulty), callback);
         callback({success: true});
-    } catch (e) {
-        console.log(e);
-        if (callback) callback({success: false, failure: e.message});
-    }
+    });
 }
 
 function _joinRoom(auth, name, socket, callback) {
-    try {
-        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUTH_INVALID');
+    _callWrapper(auth, callback, () => {
         serverRoomHandler.joinRoom(name, socket);
         callback({success: true});
-    } catch (e) {
-        console.log(e);
-        if (callback) callback({success: false, failure: e.message});
-    }
+    });
 }
 
 function _loadScore(auth, callback) {
-    try {
-        if (!requestHelper.checkRequestValid(auth)) throw new Error('AUTH_INVALID');
-        // load data from database
+    _callWrapper(auth, callback, () => {
         databaseHelper.loadScoreDataAsync()
             .then((data) => callback({success: true, data: data}))
             .catch((e) => callback({success: false, failure: e.message}));
-    } catch (e) {
-        console.log(e);
-        if (callback) callback({success: false, failure: e.message});
-    }
+    });
 }
 
 function _initializeRooms() {

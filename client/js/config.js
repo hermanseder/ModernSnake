@@ -12,7 +12,8 @@ ModernSnakeConfig = {
 };
 
 ModernSnakeMessages = {
-    loginRequested: 'LOGIN_REQUESTED'
+    loginRequested: 'LOGIN_REQUESTED',
+    tokenInvalid: 'TOKEN_INVALID'
 };
 
 ModernSnakeKeyCodes = {
