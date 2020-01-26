@@ -2,7 +2,7 @@
 const serverCryptoHelper = require(require.resolve('./serverCryptoHelper'));
 
 // External functions
-function checkRequestValid(data) {
+async function checkRequestValidAsync(data, timeStamp) {
     let isValid = true;
 
     isValid = isValid && data !== undefined;
@@ -10,17 +10,14 @@ function checkRequestValid(data) {
     isValid = isValid && data.token !== undefined;
 
     if (isValid) {
-        isValid = isValid && serverCryptoHelper.isRequestTokenValidAsync(data.token, data.username);
+        isValid = isValid && await serverCryptoHelper.isRequestTokenValidAsync(data.token, data.username, timeStamp);
     }
 
-    if (!isValid) {
-        console.log('not valid');
-    }
     return isValid;
 }
 
 
 // Exports
 module.exports = {
-    checkRequestValid: checkRequestValid
+    checkRequestValidAsync: checkRequestValidAsync
 };

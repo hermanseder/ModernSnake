@@ -8,11 +8,14 @@ ModernSnakeConfig = {
 
     maxPlayerCount: 4,
     spriteMapSize: 64,
-    gameTextStyle: '20px sans-serif'
+    gameTextStyle: '20px sans-serif',
+
+    errorMessageDuration: 4000 // 4 seconds
 };
 
 ModernSnakeMessages = {
-    loginRequested: 'LOGIN_REQUESTED'
+    loginRequested: 'LOGIN_REQUESTED',
+    tokenInvalid: 'TOKEN_INVALID'
 };
 
 ModernSnakeKeyCodes = {

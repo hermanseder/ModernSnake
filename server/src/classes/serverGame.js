@@ -81,6 +81,8 @@ class ServerGame {
         this._gameEndCallback = gameEndCallback;
         this._gameLoopRunning = false;
         this._gameSize = players.size;
+
+        this._startTimeStamp = Date.now();
     }
 
     startGame() {
@@ -120,9 +122,14 @@ class ServerGame {
     _addPlayerListener() {
         for (const player of this._players.values()) {
             player.socket.on(socketCommands.gameMovement, (auth, direction) => {
-                if (requestHelper.checkRequestValid(auth)) {
-                    this._movePlayer(player.username, direction);
-                }
+                requestHelper.checkRequestValidAsync(auth, this._startTimeStamp).then(
+                    (valid) => {
+                        if (valid) {
+                            this._movePlayer(player.username, direction);
+                        }
+                    })
+                    .catch(() => {
+                    });
             });
         }
     }

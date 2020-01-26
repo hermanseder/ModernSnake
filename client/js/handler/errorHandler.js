@@ -3,9 +3,26 @@ const ErrorHandler = (function () {
 
     function initialize() {
     }
-    
+
     function showErrorMessage(errorMessage) {
-        console.error(errorMessage);
+        _checkSpecialMessages(errorMessage);
+        _showMessage(errorMessage);
+    }
+
+    function _checkSpecialMessages(errorMessage) {
+        if (errorMessage === ModernSnakeMessages.tokenInvalid) {
+            LoginHandler.autoLogout();
+        }
+    }
+
+    function _showMessage(message) {
+        switch (message) {
+            case ModernSnakeMessages.tokenInvalid:
+                MessageUiHandler.showError('Login expired! Please login once again.');
+                break;
+            default:
+                MessageUiHandler.showError(message);
+        }
     }
 
     /* Exports */

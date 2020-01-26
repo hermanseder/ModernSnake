@@ -14,6 +14,16 @@ const LoginHandler = (function () {
         _requestReceived = false;
     }
 
+    function checkAutoLogin() {
+        const sessionToken = StorageHandler.getToken();
+        if (!sessionToken) return;
+
+        _requestReceived = true;
+        _socketCommunication.on(socketCommands.unauthorized, _unauthorizedHandler);
+        _socketCommunication.on(socketCommands.loginSucceeded, _loginSucceeded);
+        _socketCommunication.emit(socketCommands.authentication, {token: sessionToken});
+    }
+
     function login(username, password) {
         _requestedUser = username;
         _passwordHash = _getPasswordHash(password);
@@ -30,12 +40,18 @@ const LoginHandler = (function () {
         _socketCommunication.emit(socketCommands.logout, getAuth(), _logoutDone);
     }
 
-    function _logoutDone(result) {
+    function autoLogout() {
+        _logoutDone({success: true}, true);
+    }
+
+    function _logoutDone(result, isAutoLogout = false) {
         if (!result) return;
         if (result.success) {
             _socketCommunication.disconnect();
             _currentUser = undefined;
             _currentToken = undefined;
+            StorageHandler.resetToken();
+            if (!isAutoLogout) StorageHandler.resetUsername();
             LoginUiHandler.loginLogoutSucceeds();
         } else {
             ErrorHandler.showErrorMessage(result.failure);
@@ -43,7 +59,6 @@ const LoginHandler = (function () {
     }
 
     function isLoggedIn() {
-        console.log(_currentUser);
         return _currentUser !== undefined;
     }
 
@@ -87,18 +102,16 @@ const LoginHandler = (function () {
         }
 
         _currentToken = data.token;
-        _currentUser = _requestedUser;
+        _currentUser = _requestedUser || data.username;
         _requestReceived = false;
         _passwordHash = undefined;
         _requestedUser = undefined;
 
+        StorageHandler.setUsername(_currentUser);
+        StorageHandler.setToken(_currentToken);
         LoginUiHandler.loginLogoutSucceeds(_currentUser);
         ContentHandler.closeUsermenu();
         _loginEnd();
-        console.log('current token: ' + _currentToken);
-
-        // TODO REMOVE
-        // PageHandler.updatePath('game');
     }
 
     function _loginEnd() {
@@ -108,7 +121,9 @@ const LoginHandler = (function () {
     }
 
     function _loginFailed(message) {
-        LoginUiHandler.showError();
+        if (_requestedUser) {
+            LoginUiHandler.showError();
+        }
         _loginEnd();
         console.error(message);
     }
@@ -130,8 +145,10 @@ const LoginHandler = (function () {
     /* Exports */
     return {
         initialize: initialize,
+        checkAutoLogin: checkAutoLogin,
         login: login,
         logout: logout,
+        autoLogout: autoLogout,
         isLoggedIn: isLoggedIn,
         getAuth: getAuth,
     };

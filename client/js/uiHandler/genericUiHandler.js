@@ -23,10 +23,12 @@ const GenericUiHandler = (function () {
         element.formSelect();
     }
 
-    function resetMaterialInput(element) {
-        element.val('');
+    function resetMaterialInput(element, value = '') {
+        element.val(value);
         element.removeClass('valid');
-        element.next().removeClass('active');
+        if (value === '') {
+            element.next().removeClass('active');
+        }
     }
 
     /* Exports */

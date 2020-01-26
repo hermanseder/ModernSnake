@@ -146,9 +146,13 @@ h1, h2, h3, h4, h5, h6 {
     align-items: center;
 }
 
-.sidebar-controller:hover,
+.sidebar:not(.sidebar-controller-locked) > .sidebar-controller:hover,
 .sidebar-element:hover {
     background-color: #c5c1bb;
+}
+
+.sidebar-controller-locked > .sidebar-controller > a {
+    cursor: inherit;
 }
 
 .sidebar-controller .sidebar-icon {
@@ -263,6 +267,29 @@ h1, h2, h3, h4, h5, h6 {
     padding: 0;
 
     transition: margin-left 200ms ease-in-out;
+}
+
+#global-message {
+    position: fixed;
+    bottom: -50px;
+    left: 60px;
+    width: 100%;
+    height: 50px;
+
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px 15px;
+    font-size: 1.1rem;
+
+    color: #eff0eb;
+    background-color: #d0512e;
+    transition: left 200ms ease-in-out, bottom 200ms ease-in-out;
+}
+
+.sidebar-open ~ #global-message {
+    left: 200px;
 }
 
 .sidebar-open ~ .main {

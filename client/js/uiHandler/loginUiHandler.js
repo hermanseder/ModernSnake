@@ -72,19 +72,18 @@ let LoginUiHandler = (function () {
     }
 
     function _clearLogin() {
-        GenericUiHandler.resetMaterialInput(_loginUsername);
+        const username = StorageHandler.getUsername();
+        GenericUiHandler.resetMaterialInput(_loginUsername, username || '');
         GenericUiHandler.resetMaterialInput(_loginPassword);
         _removeErrorMessage();
     }
 
     function _loginButtonClicked() {
         if (_loginEnabled()) {
-            console.log('perform login');
             _removeErrorMessage();
             LoginHandler.login(_loginUsername.val(), _loginPassword.val());
         } else {
-            console.log('login not available');
-            // TODO add message
+            ErrorHandler.showErrorMessage('login not available');
         }
     }
 

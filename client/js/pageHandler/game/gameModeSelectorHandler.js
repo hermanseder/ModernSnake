@@ -60,6 +60,7 @@ let GameModeSelectorHandler = (function () {
 
     function destroy() {
         _currentMode = -1;
+        ContentHandler.unlockSidebar();
         _removeModeListener();
         _removeSocketListener();
         _removeGameStartListener();
@@ -172,6 +173,8 @@ let GameModeSelectorHandler = (function () {
         _ioCommunication.emit(socketCommands.getRoomNames, LoginHandler.getAuth(), function (data) {
             if (data.success) {
                 _updateRoomNames(data.data);
+            } else {
+                ErrorHandler.showErrorMessage(data.failure);
             }
         });
     }
@@ -276,6 +279,7 @@ let GameModeSelectorHandler = (function () {
 
     function _loadAvailableRooms() {
         let command = undefined;
+        ContentHandler.unlockSidebar();
         switch (_currentMode) {
             case ModernSnakeGameModes.twoPlayer:
                 command = socketCommands.getRooms2;
@@ -327,7 +331,10 @@ let GameModeSelectorHandler = (function () {
 
     function _updateCurrentRoom(data) {
         if (!data) return;
-        if (!data.success) return;
+        if (!data.success) {
+            ErrorHandler.showErrorMessage(data.failure);
+            return;
+        }
         if (!data.data) return;
 
         _currentSelectedRoom = data.data;
@@ -471,6 +478,7 @@ let GameModeSelectorHandler = (function () {
     function _startSinglePlayer() {
         if (!_isInputValid()) return;
 
+        ContentHandler.closeSidebar();
         const level = _getLevel();
         const difficulty = _getDifficulty();
         _ioCommunication.emit(socketCommands.startSinglePlayer, LoginHandler.getAuth(),
@@ -534,19 +542,20 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _loadPlayground() {
+        ContentHandler.closeSidebar();
+        ContentHandler.lockSidebar();
         _levelSelectionContainer.hide();
         _roomSelectionContainer.hide();
         _playgroundContainer.empty();
-        // _roomSelectionContainer.hide();
         _playgroundContainer.load(_playgroundPath, undefined, function () {
             _playgroundContainer.show();
             GamePlaygroundHandler.startGame(_currentMode, _gameEndCallback);
-            // tabContent.fadeIn('fast');
         });
     }
 
     function _gameEndCallback() {
         _currentSelectedRoom = undefined;
+        ContentHandler.unlockSidebar();
         _playgroundContainer.hide();
         _playgroundContainer.empty();
         _levelSelectionContainer.show();
