@@ -444,6 +444,7 @@ h1, h2, h3, h4, h5, h6 {
     }
 }
 
+/* SCORE */ 
 #game-score-container {
     display: flex;
     flex-direction: row;
@@ -572,7 +573,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 /* LEVELS */ 
-
+/*
 #level-builder {
     height:100%;
     display: flex;
@@ -584,4 +585,57 @@ h1, h2, h3, h4, h5, h6 {
     flex: 0 1 30%;
     background: red;
     border: 1px solid black;
+}
+*/
+
+#overlay {
+  display: grid;
+  grid-template-columns: repeat(39, 1fr);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+#board {
+  top: 1em;
+  width: 50vw;
+  height: 50vw;
+  overflow: hidden;
+  border-radius: 12px;  
+  border: solid; 
+  border-width: 12px;
+  border-color: gray;
+}
+
+.plot {
+  width: 100%;
+  height: 100%;
+  background-color: #c5c1bb;
+  background-size: calc(10vw - 4px);
+}
+
+#overlay .plot {
+    background: none;
+    border: solid; 
+    border-width: 1px;
+    border-color: gray;
+    cursor: pointer;
+}
+
+#overlay .plot-active {
+    background-color: green;
+}
+
+#overlay .plot:hover:not(.plot-active) {
+    background-color: lightcyan;
+}
+
+#overlay .plot.plot-disabled {
+    background-color: gray;
+    opacity: 0.5;
+}
+
+#levels-save {
+    margin-top: 8px;
 }
