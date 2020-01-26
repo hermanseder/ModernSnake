@@ -543,3 +543,18 @@ h1, h2, h3, h4, h5, h6 {
     height: 0;
     max-height: 0;
 }
+
+/* LEVELS */ 
+
+#level-builder {
+    height:100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.grid-tile {
+    flex: 0 1 30%;
+    background: red;
+    border: 1px solid black;
+}
