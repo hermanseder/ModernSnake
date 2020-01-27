@@ -32,12 +32,15 @@ let LoginUiHandler = (function () {
         _loginMessage.removeClass('error-message-hidden');
     }
 
-    function loginLogoutSucceeds(username) {
+    function loginLogoutSucceeds(username, resetHref = false) {
         _loggedInUser.text(username || 'Login');
         _currentUser.text(username || 'Login');
         _updateLoginStates();
         ContentHandler.setDefaultLocation();
         ContentHandler.closeUsermenu();
+        if (resetHref) {
+            window.location.href = '#' + ModernSnakeConfig.defaultPage;
+        }
     }
 
     /* Internal functions */

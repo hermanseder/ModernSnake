@@ -7,8 +7,8 @@ module.exports = {
     tokenInvalid: 'TOKEN_INVALID',
 
     jsonWebTokenSecret: 'E3A672C54BA85A4CDE0CC3526AFCC77FA7A7DDF7CBCD18362263F6D83EC58EAD',
-    // jsonWebTokenExpirationInSeconds: 10800, // 3 hours
-    jsonWebTokenExpirationInSeconds: 10, // 30 seconds
+    jsonWebTokenExpirationInSeconds: 10800, // 3 hours
+    // jsonWebTokenExpirationInSeconds: 10, // 10 seconds
 
     gameInterval: 1000 / 10,
     gameAppleBaseDuration: 5000,

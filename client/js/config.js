@@ -1,4 +1,6 @@
 ModernSnakeConfig = {
+    defaultPage: 'home',
+
     userSalt: 'ModernSnake',
     saltRounds: 10,
 

@@ -52,7 +52,8 @@ const LoginHandler = (function () {
             _currentToken = undefined;
             StorageHandler.resetToken();
             if (!isAutoLogout) StorageHandler.resetUsername();
-            LoginUiHandler.loginLogoutSucceeds();
+            LoginUiHandler.loginLogoutSucceeds(undefined, true);
+            PageHandler.updatePath(ModernSnakeConfig.defaultPage);
         } else {
             ErrorHandler.showErrorMessage(result.failure);
         }
@@ -111,7 +112,17 @@ const LoginHandler = (function () {
         StorageHandler.setToken(_currentToken);
         LoginUiHandler.loginLogoutSucceeds(_currentUser);
         ContentHandler.closeUsermenu();
+
+        _updateMenu();
         _loginEnd();
+    }
+
+    function _updateMenu() {
+        const newLocation =  window.location.hash.substr(1);
+        if (newLocation) {
+            PageHandler.updatePath(newLocation);
+            ContentHandler.setCurrentMenuItem(newLocation);
+        }
     }
 
     function _loginEnd() {

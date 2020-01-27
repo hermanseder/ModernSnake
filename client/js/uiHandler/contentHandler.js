@@ -101,6 +101,21 @@ const ContentHandler = (function () {
         );
     }
 
+    function setCurrentMenuItem(id) {
+        sidebarElements.each(function () {
+            if ($(this).length > 0) {
+                const element = $(this)[0];
+                const link = $(element).find('a');
+                const href = GenericUiHandler.getHrefDestination(link);
+                if (href === id) {
+                    $(this).addClass('sidebar-active');
+                } else {
+                    $(this).removeClass('sidebar-active');
+                }
+            }
+        });
+    }
+
     function _isSidebarOpen() {
         return sidebar.hasClass('sidebar-open');
     }
@@ -145,6 +160,7 @@ const ContentHandler = (function () {
         setDefaultLocation: setDefaultLocation,
         closeSidebar: closeSidebar,
         lockSidebar: lockSidebar,
-        unlockSidebar: unlockSidebar
+        unlockSidebar: unlockSidebar,
+        setCurrentMenuItem: setCurrentMenuItem
     };
 })();
