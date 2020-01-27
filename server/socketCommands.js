@@ -39,5 +39,7 @@ module.exports = {
     gameMovement: 'gameMovement',
 
     loadScore: 'loadScore',
-    updateScore: 'updateScore'
+    updateScore: 'updateScore',
+
+    createLevel: 'createLevel'
 }

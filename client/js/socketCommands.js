@@ -30,6 +30,7 @@ socketCommands = {
 
     getLevels: 'getLevels',
     updateLevels: 'updateLevels',
+    createLevel: 'createLevel',
 
     getDifficulty: 'getDifficulty',
 

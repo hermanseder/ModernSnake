@@ -19,6 +19,7 @@ const requestHelper = require(require.resolve('./src/helper/requestHelper'));
 const serverLoginHandler = require(require.resolve('./src/handler/serverLoginHandler'));
 const serverRoomHandler = require(require.resolve('./src/handler/serverRoomHandler'));
 const serverGameHandler = require(require.resolve('./src/handler/serverGameHandler'));
+const serverLevelHandler = require(require.resolve('./src/handler/serverLevelHandler'));
 
 // Variables
 let ioCommunication;
@@ -29,11 +30,11 @@ async function startServerAsync(server) {
         await databaseHelper.initializeAsync();
 
         ioCommunication = socketIO.listen(server);
-        _initializeSocket();
         _initializeAuthentication();
 
         _initializeGames();
         _initializeRooms();
+        _initializeLevels();
     } catch (e) {
         console.error(e.message);
         throw e;
@@ -46,9 +47,6 @@ function stopServer() {
 
 
 // Internal functions
-function _initializeSocket() {
-    // nothing to do.
-}
 
 function _initializeAuthentication() {
     socketAuth(ioCommunication, {
@@ -62,6 +60,7 @@ function _initializeAuthentication() {
 function _initializeHandlers(socket, data) {
     _initializeHandlersGame(socket);
     _initializeHandlerScore(socket);
+    _initializeHandlerLevel(socket);
 }
 
 /* GAME */
@@ -94,6 +93,10 @@ function _initializeHandlersGame(socket) {
 
 function _initializeHandlerScore(socket) {
     socket.on(socketCommands.loadScore, _loadScore);
+}
+
+function _initializeHandlerLevel(socket) {
+    socket.on(socketCommands.createLevel, _createLevel);
 }
 
 function _removeListener(socket) {
@@ -199,6 +202,20 @@ function _loadScore(auth, callback) {
     });
 }
 
+function _createLevel(auth, levelName, levelData, callback) {
+    _callWrapper(auth, callback, () => {
+        serverLevelHandler.saveLevelAsync(levelName, levelData)
+            .then((result) => {
+                if (result) {
+                    callback({success: true});
+                } else {
+                    callback({success: false, failure: 'UNABLE_TO_SAVE'});
+                }
+            })
+            .catch((e) => callback({success: false, failure: e.message}));
+    });
+}
+
 function _initializeRooms() {
     serverRoomHandler.initialize(ioCommunication);
 
@@ -214,6 +231,10 @@ function _initializeRooms() {
 
 function _initializeGames() {
     serverGameHandler.initialize(ioCommunication);
+}
+
+function _initializeLevels() {
+    serverLevelHandler.initialize(ioCommunication);
 }
 
 /* HELPER */

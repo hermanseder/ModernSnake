@@ -5,6 +5,7 @@ ModernSnakeConfig = {
     minimumUsernameLength: 1,
     minimumPasswordLength: 1,
     minimumRoomLength: 3,
+    minimumLevelLength: 3,
 
     maxPlayerCount: 4,
     spriteMapSize: 64,

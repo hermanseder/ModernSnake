@@ -147,6 +147,19 @@ async function loadScoreDataAsync() {
     }
 }
 
+async function storeLevelAsync(levelName, levelData) {
+    console.log('STORE:');
+    console.log(levelName);
+    try {
+        return _serializeWrapper(async () => {
+            // TODO GERI SAVE DATA
+            return true;
+        });
+    } catch (e) {
+        throw new Error('STORE_FAILED');
+    }
+}
+
 // Internal functions
 async function _serializeWrapper(callback) {
     return new Promise((resolve, reject) => {
@@ -341,6 +354,7 @@ module.exports = {
     getLevelsAsync: getLevelsAsync,
     storeGameResultAsync: storeGameResultAsync,
     loadScoreDataAsync: loadScoreDataAsync,
+    storeLevelAsync: storeLevelAsync,
 
     levelNames: levelNames
 }
