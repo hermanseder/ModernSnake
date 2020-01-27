@@ -9,6 +9,7 @@ socketResult: {
 // Dependencies
 const socketIO = require('socket.io');
 const socketAuth = require('socketio-auth');
+const htmlEscaper = require('html-escaper');
 
 const config = require(require.resolve('./serverConfig'));
 const socketAuthenticationHelper = require(require.resolve('./src/helper/socketAuthenticationHelper'));
@@ -178,8 +179,12 @@ function _getCurrentRoom(size, auth, socketId, callback) {
 }
 
 function _createRoom(auth, roomName, level, difficulty, countPlayers, callback) {
+    const escapedRoomName = htmlEscaper.escape(roomName);
+    const escapedlevel = htmlEscaper.escape(level);
+    const escapedDifficulty = htmlEscaper.escape(difficulty);
+    const escapedCountPlayers = htmlEscaper.escape(countPlayers);
     _callWrapper(auth, callback, () => {
-        serverRoomHandler.createRoom(roomName, level, countPlayers, Number(difficulty), callback);
+        serverRoomHandler.createRoom(escapedRoomName, escapedlevel, escapedCountPlayers, Number(escapedDifficulty), callback);
         callback({success: true});
     });
 }
