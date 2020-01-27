@@ -1,9 +1,11 @@
 const PageHandler = (function () {
     let _currentClass;
+    let _currentId;
     let _mainContent;
     let _mainTitle;
 
     function initialize(socket, mainContent, mainTitle) {
+        _currentId = undefined;
         _currentClass = undefined;
         _mainContent = mainContent;
         _mainTitle = mainTitle;
@@ -12,6 +14,8 @@ const PageHandler = (function () {
     }
 
     function updatePath(id) {
+        if (_currentId === id) return false;
+        _currentId = id;
         switch (id) {
             case 'home':
                 return _loadPath(id, 'home', PageHome);
@@ -49,12 +53,12 @@ const PageHandler = (function () {
         }
 
         _mainContent.empty();
-        // _mainContent.hide();
+        _mainContent.hide();
         _mainContent.load('pages/' + dest + '.html', undefined, function () {
             _mainTitle.text(title);
             _currentClass = newClass;
             _currentClass.initialize();
-            // _mainContent.fadeIn('fast');
+            _mainContent.fadeIn('fast');
         });
 
         return true;

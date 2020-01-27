@@ -60,12 +60,12 @@ const TabHandler = (function () {
         const path = destinationEmpty ? parameter.sourcePath : (parameter.sourcePath + destination + '.html');
 
         tabContent.empty();
-        // tabContent.hide();
+        tabContent.hide();
         tabContent.load(path, undefined, function () {
             if (parameter.callback) {
                 parameter.callback(parameter.dataCallback);
             }
-            // tabContent.fadeIn('fast');
+            tabContent.fadeIn('fast');
         });
     }
 
