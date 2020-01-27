@@ -22,4 +22,6 @@ npm run start
 
 👤 **Hermanseder & Rieß**
 
-* Github: [@hermanseder](https://github.com/hermanseder)_
+* Github: 
+    * [@hermanseder](https://github.com/hermanseder)
+    * [@gotome](https://github.com/gotome)
