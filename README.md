@@ -4,7 +4,7 @@
 
 > Multiplayer version of snake
 
-### ✨ [Demo](localhost:5000)
+### ✨ [Demo (localhost:5000)](localhost:5000)
 
 ## Install
 
@@ -12,11 +12,23 @@
 npm install
 ```
 
-## Usage
+## Start server
 
 ```sh
 npm run start
 ```
+
+## Credentials
+
+| User          | Password      |
+| ------------- |:-------------:|
+| user1         | pw1           |
+| user2         | pw2           |
+| user3         | pw3           |
+| user4         | pw4           |
+| user5         | pw5           |
+| user6         | pw6           |
+
 
 ## Author
 
