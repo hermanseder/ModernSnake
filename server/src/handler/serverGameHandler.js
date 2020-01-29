@@ -25,14 +25,14 @@ class ServerGameHandler {
         this._ioCommunication = socket;
     }
 
-    startGame(id, level, players, speedDegree, difficulty, gameDoneCallback) {
+    async startGameAsync(id, level, players, speedDegree, difficulty, gameDoneCallback) {
         const game = new ServerGame(this._ioCommunication, id, level, players, speedDegree, 
             difficulty, this._gameEndCallbackAsync.bind(this));
         this._games.set(id, {
             gameInstance: game,
             endCallback: gameDoneCallback
         });
-        game.startGame();
+        await game.startGameAsync();
         return game;
     }
 

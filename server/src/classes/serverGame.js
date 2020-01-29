@@ -67,6 +67,7 @@ _gameLoopRunning: boolean;
 const config = require(require.resolve('../../serverConfig.js'));
 const socketCommands = require(require.resolve('../../socketCommands'));
 const requestHelper = require(require.resolve('../helper/requestHelper'));
+const databaseHelper = require(require.resolve('../helper/databaseHelper'));
 const {interval} = require('rxjs');
 
 class ServerGame {
@@ -85,14 +86,13 @@ class ServerGame {
         this._startTimeStamp = Date.now();
     }
 
-    startGame() {
-        // TODO load from database
+    async startGameAsync() {
         this._phase = 0;
         this._interval = config.gameInterval;
         this._snakeMoveTime = 0;
         this._appleAliveTime = 0;
 
-        this._buildInitialGameData(config.gameDimensions, config.gameStartSize,
+        await this._buildInitialGameDataAsync(config.gameDimensions, config.gameStartSize,
             config.gameBeforeTime, config.gameAfterTime);
 
         this._addPlayerListener();
@@ -456,7 +456,7 @@ class ServerGame {
         this._ioCommunication.to(this._id).emit(socketCommands.gameUpdate, this._gameData);
     }
 
-    _buildInitialGameData(dimensions, startSize, beforeTime, afterTime) {
+    async _buildInitialGameDataAsync(dimensions, startSize, beforeTime, afterTime) {
         this._gameData = {
             dimension: dimensions,
             snakeSpeed: this._speedDegree,
@@ -464,7 +464,7 @@ class ServerGame {
             game: {
                 snakes: this._buildInitialSnakes(dimensions, startSize),
                 apple: undefined,
-                walls: this._getLevelWalls()
+                walls: await this._getLevelWallsAsync()
             },
             before: {
                 countdown: beforeTime
@@ -523,7 +523,11 @@ class ServerGame {
         }
     }
 
-    _getLevelWalls() {
+    async _getLevelWallsAsync() {
+        console.log(this._level);
+        const result = await databaseHelper.getLevelWallsAsync(this._level);
+        console.log(result);
+        return result;
         // TODO load from database
         return [
             {x: 2, y: 2},

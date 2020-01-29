@@ -89,24 +89,34 @@ let PageLevels = (function () {
         valid = valid && levelName !== undefined;
         valid = valid && levelName.length >= ModernSnakeConfig.minimumLevelLength;
         valid = valid && _levelNames.indexOf(levelName) < 0;
-
-        // TODO GERI CHECK GRID VALID
-
+        
         return valid;
     }
 
     function _saveLevel() {
-        console.log('save');
         if (!_isInputValid()) return;
 
-        // TODO GERI reformat or whatever before sending to server
         const levelName = _getLevelName();
-        _ioCommunication.emit(socketCommands.createLevel, LoginHandler.getAuth(), levelName, gameState, _saveLevelDone);
+
+        const levelData = [];
+        for (let i = 0; i < gameState.length; i++) {
+            for (let j = 0; j < gameState[i].length; j++) {
+                if (gameState[i][j]) {
+                    levelData.push({x: i, y: j});
+                }
+            }
+        }
+
+        _ioCommunication.emit(socketCommands.createLevel, LoginHandler.getAuth(), levelName, levelData, _saveLevelDone);
     }
 
     function _saveLevelDone(result) {
         if (result.success) {
-            // TODO GERI success / clear / ...
+            document.getElementById('overlay').remove();
+            const overlay = document.createElement('div');
+            overlay.id = 'overlay';
+            document.getElementById('board').appendChild(overlay);
+            _createLevelGrid();
             GenericUiHandler.resetMaterialInput(_levelName);
         } else {
             ErrorHandler.showErrorMessage(result.failure);
@@ -148,9 +158,7 @@ let PageLevels = (function () {
                             gameState[i][j] = false;
                             wallCount--;
                         }
-                        console.log(wallCount);
                     }
-
                 }, false);
                 document.getElementById('overlay').appendChild(span);
             }

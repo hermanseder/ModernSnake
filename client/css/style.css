@@ -604,7 +604,7 @@ h1, h2, h3, h4, h5, h6 {
     overflow: hidden;
     border-radius: 12px;
     border: solid;
-    border-width: 12px;
+    border-width: 8px;
     border-color: gray;
     margin: 0 auto;
 }
@@ -625,11 +625,11 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 #overlay .plot-active {
-    background-color: green;
+    background-color: darkgrey;
 }
 
-#overlay .plot:hover:not(.plot-active) {
-    background-color: lightcyan;
+#overlay .plot:hover:not(.plot-active):not(.plot-disabled) {
+    background-color: #eacb48;
 }
 
 #overlay .plot.plot-disabled {

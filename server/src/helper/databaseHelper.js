@@ -33,6 +33,7 @@ async function initializeAsync() {
             await _insertDummyDataAsync();
         }
     } catch (e) {
+        console.error(e);
         throw new Error('DATABASE_NOT_AVAILABLE');
     }
 }
@@ -147,13 +148,46 @@ async function loadScoreDataAsync() {
     }
 }
 
+async function getLevelWallsAsync(levelName) {
+    const levelWallStatement = database.prepare(`
+    SELECT rowNr, colNr, value
+    FROM matrix
+    WHERE level = ?
+    ORDER BY rowNr, colNr;`);
+    const getAllPromise = util.promisify(levelWallStatement.all);
+    const result = await getAllPromise.call(levelWallStatement, levelName);
+
+    if(result) {
+        const matrix = [];
+
+        for(const resultRow of result) {
+            if (resultRow.value === 1 && resultRow.rowNr && resultRow.colNr) {
+                matrix.push({x: resultRow.rowNr, y: resultRow.colNr});
+            }
+        }
+        return matrix;
+    }
+    return [];
+}
+
+
 async function storeLevelAsync(levelName, levelData) {
-    console.log('STORE:');
-    console.log(levelName);
     try {
-        return _serializeWrapper(async () => {
-            // TODO GERI SAVE DATA
-            return true;
+        return _serializeWrapper(async () => {           
+            const levelStatement = database.prepare(`INSERT INTO level(name) VALUES (?);`);
+            let matrixStatement = '';
+
+            const levelStatementRunPromise = util.promisify(levelStatement.run);
+            await levelStatementRunPromise.call(levelStatement, levelName);
+
+           
+            for (const entry of levelData) {
+                const matrixStatement = database.prepare(`INSERT INTO matrix (rowNr, colNr, value, level) VALUES(?, ?, ?, ?);`);
+                const matrixStatementRunPromise = util.promisify(matrixStatement.run);
+                await matrixStatementRunPromise.call(matrixStatement, entry.y, entry.x, true, levelName);
+            }
+          
+           return true;
         });
     } catch (e) {
         throw new Error('STORE_FAILED');
@@ -280,12 +314,12 @@ function _sqlTableGameScore() {
 
 function _sqlCreateTableMatrix() {
     return `
-        CREATE TABLE Matrix(
+        CREATE TABLE matrix(
             id INTEGER PRIMARY KEY AUTOINCREMENT, 
+            level TEXT NOT NULL,
             rowNr INTEGER NOT NULL, 
             colNr INTEGER NOT NULL, 
             value BOOLEAN, 
-            level TEXT NOT NULL, 
             CONSTRAINT fk_level
                 FOREIGN KEY (level)
                 REFERENCES level(name)
@@ -355,6 +389,7 @@ module.exports = {
     storeGameResultAsync: storeGameResultAsync,
     loadScoreDataAsync: loadScoreDataAsync,
     storeLevelAsync: storeLevelAsync,
+    getLevelWallsAsync: getLevelWallsAsync,
 
     levelNames: levelNames
 }

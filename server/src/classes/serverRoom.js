@@ -67,7 +67,7 @@ class ServerRoom {
         socketSource.join(this._name);
 
         if (this.getRemainingPlaces() <= 0) {
-            this._startGame();
+            this._startGameAsync().then(() => {}).catch((e) => console.error(e.message));
         }
     }
 
@@ -92,9 +92,9 @@ class ServerRoom {
         this._currentGame = undefined;
     }
 
-    _startGame() {
+    async _startGameAsync() {
         const speedDegree = this._getSpeedDegree(this._difficulty);
-        this._currentGame = serverGameHandler.startGame(this._name, this._level, this._currentPlayers,
+        this._currentGame = await serverGameHandler.startGameAsync(this._name, this._level, this._currentPlayers,
             speedDegree, this._difficulty, this._gameDoneCallback.bind(this));
     }
 

@@ -11,7 +11,7 @@ ModernSnakeConfig = {
     spriteMapSize: 64,
     gameTextStyle: '20px sans-serif',
     gameDimensions: 39,
-    maxWalls: 10,
+    maxWalls: 250,
 
     errorMessageDuration: 4000 // 4 seconds
 };
