@@ -6,7 +6,7 @@
     <title>Home</title>
 </head>
 
-<body>
+<body>        
         <h3 id="result">Modern Snake</h3>
 
         <h4 id="description">Description:</h4>
@@ -25,32 +25,26 @@
         </p>
 
         <div class="info-container">
-            <div class="left-container">
+            <div id = "keyboard-container">
                 <h2 id="key-control"> Keyboard-Control </h2>
-
+                <p> You can use following keys to control the snake on your computer. </p>
                 <div>
                     <img width="100%" src="img/keyboard-layout.png" alt='keyboard-layout'>
                 </div>
-                <div id="keyboard-description">
-                    <ul>
-                        <li>W: move Snake up</li>
-                        <li>A: move Snake left</li>
-                        <li>S: move Snake down</li>
-                        <li>D: move Snake right</li>
-                    </ul>
-                    <div class="spacer"></div>
-                    <ul>
-                        <li>Arrow Key Up: move Snake up</li>
-                        <li>Arrow Key Left: move Snake left</li>
-                        <li>Arrow Key Down: move Snake down</li>
-                        <li>Arrow Key Right: move Snake right</li>
-                    </ul>
-                </div>
             </div>
-            <div class="right-container">
-                <h2 id = game-board> Game-Board </h2>
+            <div id = "swipe-container">
+                <h2 id="swipe-control"> Smartphone-Control </h2>
+                <p>You are able to control the snake on your smartphone by using swipe gestures.</p>
+
                 <div>
-                    <img width="100%" src="img/example.jpg" alt='example'>
+                    <img class = "description-img" src="img/swipe.png" alt='swipe-left-layout'>
+                </div>
+
+            </div>
+            <div id = "game-board-container">
+                <h2 id = "game-board"> Game-Board </h2>
+                <div>
+                    <img class = "description-img" src="img/game-board.png" alt='game-board'>
                 </div>
             </div>
         </div>

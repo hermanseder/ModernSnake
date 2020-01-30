@@ -44,6 +44,15 @@ let PageScore = (function () {
         for (let i = 0; i < scoreData.length; i++) {
             _parentScoreBox.append(_createScoreBoardChild(scoreData[i]));
         } 
+        if (scoreData.length == 0) {
+            _parentScoreBox.append(_createEmptyScoreBoardChild()); 
+        }
+    }
+
+    function _createEmptyScoreBoardChild() {
+        let htmlCode = '';
+        htmlCode = '<h3>No Statistics available</h3>' 
+        return htmlCode; 
     }
 
     function _createScoreBoardChild(data) {
@@ -80,13 +89,25 @@ let PageScore = (function () {
     }
 
     function _createScoreChildBody(data) {
+        let lastScore = 0; 
         let htmlCode = '';
+
         for (let i = 0; i < data.length; i++) {
             htmlCode += '<tr>';
-            htmlCode += '<td>' + (i + 1) + '.</td>';
+
+            //same scores result to same rankings 
+            if (lastScore == data[i].score) {
+                htmlCode += '<td>  </td>';
+            }
+            else {
+                htmlCode += '<td>' + (i + 1) + '.</td>';
+            }             
+
             htmlCode += '<td>' + data[i].username + '</td>';
             htmlCode += '<td>' + data[i].score + '</td>';
             htmlCode += '</tr>';
+
+            lastScore = data[i].score; 
         }
         return htmlCode;
     }

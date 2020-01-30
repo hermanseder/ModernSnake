@@ -33,6 +33,7 @@ let PageGame = (function () {
     function destroy() {
         console.log('destroy page game');
         GamePlaygroundHandler.stopGame();
+        GameModeSelectorHandler.destroy();
     }
 
     function isAllowed() {

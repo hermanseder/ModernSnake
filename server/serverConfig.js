@@ -25,4 +25,6 @@ module.exports = {
     directionDown: 'down',
     directionLeft: 'left',
     directionRight: 'right',
+
+    maxScoreResult: 10
 }

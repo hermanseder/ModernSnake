@@ -369,14 +369,10 @@ h1, h2, h3, h4, h5, h6 {
     grid-column-gap: 10px;
 }
 
-.spacer {
-    flex: 1;
-}
-
-#keyboard-description {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+.description-img {
+    display: block;
+    width: 80%;
+    margin: auto;
 }
 
 /* GAME */
@@ -526,7 +522,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .child-score-box {
     background-color: #c5c1bb;
-    color:  #484e4a;
+    color: #484e4a;
     padding-left: 1rem;
     text-align: center;
     border-radius: 5px;
@@ -547,7 +543,7 @@ h1, h2, h3, h4, h5, h6 {
 .child-score-box-level {
     width: 100%;
     padding: 10px 0;
-    
+
     font-weight: 600;
     font-size: 1.4rem;
 }
@@ -573,4 +569,58 @@ h1, h2, h3, h4, h5, h6 {
     opacity: 0;
     height: 0;
     max-height: 0;
+}
+
+/* LEVELS */
+#overlay {
+    display: grid;
+    grid-template-columns: repeat(39, 1fr);
+    top: 0;
+    left: 0; 
+    width: 100%;
+    height: 100%;
+}
+
+#board {
+    top: 1em;
+    width: 50vw;
+    height: 50vw;
+    overflow: hidden;
+    border-radius: 12px;
+    border: solid;
+    border-width: 8px;
+    border-color: gray;
+    margin: 0 auto;
+}
+
+.plot {
+    width: 100%;
+    height: 100%;
+    background-color: #c5c1bb;
+    background-size: calc(10vw - 4px);
+}
+
+#overlay .plot {
+    background: none;
+    border: solid;
+    border-width: 1px;
+    border-color: gray;
+    cursor: pointer;
+}
+
+#overlay .plot-active {
+    background-color: darkgrey;
+}
+
+#overlay .plot:hover:not(.plot-active):not(.plot-disabled) {
+    background-color: #eacb48;
+}
+
+#overlay .plot.plot-disabled {
+    background-color: gray;
+    opacity: 0.5;
+}
+
+#levels-save {
+    margin-top: 8px;
 }
