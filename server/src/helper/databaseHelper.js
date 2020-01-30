@@ -13,7 +13,7 @@ let allPromise;
 let runPromise;
 
 // Constants
-const levelNames = ['Level 1', 'Level 2', 'Level 3'];
+const levelNames = ['Border'];
 
 // External functions
 async function initializeAsync() {
@@ -136,11 +136,11 @@ async function loadScoreDataAsync() {
                 const levelName = levelResult.name;
                 const scoreData = await allPreparedPromise.call(scoreStatement, levelName);
 
-                if (scoreData.length > 0) {    
+                if (scoreData.length > 0) {
                     result.push({name: levelName, scoreData: scoreData});
                 }
             }
-            
+
             return result;
         });
     } catch (e) {
@@ -157,11 +157,11 @@ async function getLevelWallsAsync(levelName) {
     const getAllPromise = util.promisify(levelWallStatement.all);
     const result = await getAllPromise.call(levelWallStatement, levelName);
 
-    if(result) {
+    if (result) {
         const matrix = [];
 
-        for(const resultRow of result) {
-            if (resultRow.value === 1 && resultRow.rowNr && resultRow.colNr) {
+        for (const resultRow of result) {
+            if (resultRow.value === 1 && resultRow.rowNr !== undefined && resultRow.colNr !== undefined) {
                 matrix.push({x: resultRow.rowNr, y: resultRow.colNr});
             }
         }
@@ -173,21 +173,20 @@ async function getLevelWallsAsync(levelName) {
 
 async function storeLevelAsync(levelName, levelData) {
     try {
-        return _serializeWrapper(async () => {           
+        return _serializeWrapper(async () => {
             const levelStatement = database.prepare(`INSERT INTO level(name) VALUES (?);`);
-            let matrixStatement = '';
 
             const levelStatementRunPromise = util.promisify(levelStatement.run);
             await levelStatementRunPromise.call(levelStatement, levelName);
 
-           
+
             for (const entry of levelData) {
                 const matrixStatement = database.prepare(`INSERT INTO matrix (rowNr, colNr, value, level) VALUES(?, ?, ?, ?);`);
                 const matrixStatementRunPromise = util.promisify(matrixStatement.run);
                 await matrixStatementRunPromise.call(matrixStatement, entry.y, entry.x, true, levelName);
             }
-          
-           return true;
+
+            return true;
         });
     } catch (e) {
         throw new Error('STORE_FAILED');
@@ -329,25 +328,24 @@ function _sqlCreateTableMatrix() {
 
 async function _insertDummyDataAsync() {
     const userData = await _sqlDummyDataUserAsync();
-    const levelData = await _sqlDummyDataLevelAsync();
 
     await _serializeWrapper(async () => {
         for (const sql of userData) {
             await runPromise.call(database, sql);
         }
-        for (const sql of levelData) {
-            await runPromise.call(database, sql);
-        }
     });
+
+    await _createDummyLevels();
 }
 
 async function _sqlDummyDataUserAsync() {
     const users = [
-        {username: 'rudi', password: 'pw'},
-        {username: 'geri', password: 'pw'},
-        {username: 'bot1', password: 'pw'},
-        {username: 'bot2', password: 'pw'},
-        {username: 'bot3', password: 'pw'},
+        {username: 'user1', password: 'pw1'},
+        {username: 'user2', password: 'pw2'},
+        {username: 'user3', password: 'pw3'},
+        {username: 'user4', password: 'pw4'},
+        {username: 'user5', password: 'pw5'},
+        {username: 'user6', password: 'pw6'},
     ];
 
     const result = [];
@@ -364,12 +362,26 @@ async function _sqlDummyDataUserAsync() {
     return result;
 }
 
-async function _sqlDummyDataLevelAsync() {
-    const result = [];
-    for (const level of levelNames) {
-        result.push(`INSERT INTO level (name) VALUES ('${level}');`);
+async function _createDummyLevels() {
+    await _createDummyLevelBorder();
+    // TODO GERI add level
+}
+
+async function _createDummyLevelBorder() {
+    const levelName = 'Border';
+    const walls = [];
+    const dimension = config.gameDimensions;
+
+    for (let i = 0; i < dimension; i++) {
+        if (i != Math.floor(dimension / 2)) {
+            walls.push({x: 0, y: i});
+            walls.push({x: dimension - 1, y: i});
+            walls.push({x: i, y: 0});
+            walls.push({x: i, y: dimension - 1 });
+        }
     }
-    return result;
+
+    await storeLevelAsync(levelName, walls);
 }
 
 async function _getUserIdFromNameAsync(username) {

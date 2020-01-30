@@ -32,7 +32,6 @@ class ServerLevelHandler {
 
         let invalidColFound = false;
         for(const entry of levelData) {
-            console.log(entry);
             if (entry.x === undefined || entry.y === undefined || entry.x > config.gameDimension || entry.y > config.gameDimension) {
                 invalidColFound = true;
             }
