@@ -68,7 +68,6 @@ const config = require(require.resolve('../../serverConfig.js'));
 const socketCommands = require(require.resolve('../../socketCommands'));
 const requestHelper = require(require.resolve('../helper/requestHelper'));
 const databaseHelper = require(require.resolve('../helper/databaseHelper'));
-const {interval} = require('rxjs');
 
 class ServerGame {
 
@@ -96,7 +95,6 @@ class ServerGame {
             config.gameBeforeTime, config.gameAfterTime);
 
         this._addPlayerListener();
-        console.log('emit gamestart event to ' + this._id);
         this._ioCommunication.to(this._id).emit(socketCommands.gameStart);
         this._startGameLoop();
     }
@@ -190,16 +188,26 @@ class ServerGame {
     }
 
     _startGameLoop() {
-        // TODO USE BETTER ONE
         this._gameLoopRunning = true;
-        const loopSubscription = interval(this._interval)
-            .subscribe((round) => {
-                if (this._gameLoopRunning) {
-                    this._updateGame(this._interval);
-                } else {
-                    loopSubscription.unsubscribe();
-                }
-            });
+        this._previousTick = Date.now();
+        this._gameLoop();
+    }
+
+    _gameLoop() {
+        if (!this._gameLoopRunning) return;
+        const now = Date.now();
+
+        if (this._previousTick + this._interval <= now) {
+            const delta = (now - this._previousTick);
+            this._previousTick = now;
+            this._updateGame(delta);
+        }
+
+        if (Date.now() - this._previousTick < this._interval - 16) {
+            setTimeout(this._gameLoop.bind(this), this._interval);
+        } else {
+            setImmediate(this._gameLoop.bind(this));
+        }
     }
 
     _stopGameLoop() {
@@ -524,21 +532,8 @@ class ServerGame {
     }
 
     async _getLevelWallsAsync() {
-        console.log(this._level);
         const result = await databaseHelper.getLevelWallsAsync(this._level);
-        console.log(result);
         return result;
-        // TODO load from database
-        return [
-            {x: 2, y: 2},
-            {x: 2, y: 3},
-            {x: 2, y: 4},
-            {x: 3, y: 4},
-            {x: 4, y: 4},
-            {x: 5, y: 4},
-            {x: 6, y: 4},
-            {x: 7, y: 4},
-        ];
     }
 }
 

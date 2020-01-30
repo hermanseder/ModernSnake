@@ -19,6 +19,8 @@ let GamePlaygroundHandler = (function () {
     const _classScoreItem = '.game-score-item';
     const _classScoreUser = '.game-score-user';
     const _classScoreValue = '.game-score-value';
+    const _classScoreRank = '.game-score-rank';
+    const _classScoreDivider = '.game-score-divider';
     const _spriteMapSnakeUrl = '../../img/game/game_snake_graphics_';
     const _spriteMapGameUrl = '../../img/game/game_graphics';
     const _spriteMapFileType = 'png';
@@ -231,7 +233,7 @@ let GamePlaygroundHandler = (function () {
         }
         _drawGameApple(segmentSize, gameData.game.apple);
         _drawGameTextOverlay(gameData, currentSize);
-        _drawScore(gameData.game.snakes);
+        _drawScore(gameData.game.snakes, gameData.after.result);
     }
 
     function _drawGameTextOverlay(gameData, width) {
@@ -438,7 +440,7 @@ let GamePlaygroundHandler = (function () {
             segmentSize, segmentSize);
     }
 
-    function _drawScore(userData) {
+    function _drawScore(userData, placeData) {
         const controls = _gameScoreContainer.find(_classScoreItem);
         if (controls.length != userData.length) {
             console.error('INVALID_DATA_LENGTH');
@@ -453,8 +455,30 @@ let GamePlaygroundHandler = (function () {
             valueControl.text(item.score);
 
             const user = control.find(_classScoreUser);
-            if (user) user.text(item.username);
+            if (user) {
+                const userName = item.username;
+                const userPlace = _getPlace(placeData, userName);
+                user.empty();
+                if (userPlace) {
+                    user.html(`
+                        <span class="${_classScoreRank}">${userPlace}</span>
+                        <span class="${_classScoreDivider}">|</span>
+                        <span>${item.username}</span>
+                    `);
+                } else {
+                    user.html(`<span>${item.username}</span>`);
+                }
+            }
         }
+    }
+
+    function _getPlace(placeData, username) {
+        if (!placeData) return undefined;
+        if (!username) return undefined;
+        for (const place of placeData) {
+            if (place.username === username) return place.rank;
+        }
+        return undefined;
     }
 
     return {
