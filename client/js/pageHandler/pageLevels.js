@@ -58,7 +58,6 @@ let PageLevels = (function () {
             const levelName = data[i].name;
             _levelNames.push(levelName);
         }
-        console.log(_levelNames);
     }
 
     function _initializeListener() {
@@ -166,7 +165,6 @@ let PageLevels = (function () {
     }
 
     function _getGameState() {
-        console.warn(gameState);
         return gameState;
     }
 

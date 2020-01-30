@@ -24,14 +24,12 @@ class ServerLevelHandler {
     }
 
     async saveLevelAsync(levelName, levelData) {
-        // TODO GERI validate levelName
         const nameResult = await databaseHelper.getLevelsAsync();
 
         if(!!nameResult.find(r => r.name === levelName)) {
             throw new Error("INVALID_LEVEL_NAME");
         }
 
-        // TODO GERI validate levelData
         let invalidColFound = false;
         for(const entry of levelData) {
             console.log(entry);
