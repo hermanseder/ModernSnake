@@ -460,7 +460,6 @@ class ServerGame {
     }
 
     _sendUpdateToUsers() {
-        // console.log('emit');
         this._ioCommunication.to(this._id).emit(socketCommands.gameUpdate, this._gameData);
     }
 

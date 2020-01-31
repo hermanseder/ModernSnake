@@ -63,7 +63,6 @@ class ServerRoom {
         if (this._currentPlayers.has(socketSource.id)) throw new Error('ALREADY_IN_ROOM');
 
         this._currentPlayers.set(socketSource.id, {socket: socketSource, username: socketSource.username});
-        console.log('join ' + socketSource.id + ' to ' + this._name);
         socketSource.join(this._name);
 
         if (this.getRemainingPlaces() <= 0) {

@@ -254,8 +254,8 @@ async function _createTablesAsync() {
         await runPromise.call(database, _sqlTableUser());
         await runPromise.call(database, _sqlTableLevel());
         await runPromise.call(database, _sqlTableGame());
-        await runPromise.call(database, _sqlTableGameScore());     // TO-DO CHECK IMPLEMENTATION
-        await runPromise.call(database, _sqlCreateTableMatrix());  // TO-DO CHECK IMPLEMENTATION
+        await runPromise.call(database, _sqlTableGameScore());
+        await runPromise.call(database, _sqlCreateTableMatrix());
     });
 }
 
@@ -365,7 +365,6 @@ async function _sqlDummyDataUserAsync() {
 async function _createDummyLevels() {
     await _createDummyLevelBorder();
     await _createDummyLevelFh();
-    // TODO GERI add level
 }
 
 async function _createDummyLevelBorder() {

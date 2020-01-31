@@ -394,7 +394,6 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _registerGameStartListener() {
-        console.log('register game start listener');
         _ioCommunication.on(socketCommands.gameStart, _multiPlayerStarted);
     }
 
@@ -494,7 +493,6 @@ let GameModeSelectorHandler = (function () {
     }
 
     function _multiPlayerStarted() {
-        console.log('multi player started event');
         _loadPlayground();
     }
 

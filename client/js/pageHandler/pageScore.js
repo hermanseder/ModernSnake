@@ -11,7 +11,6 @@ let PageScore = (function () {
     }
 
     function initialize() {
-        console.log('init page score');
         _parentScoreBox = $('#parent-score-box');
 
         // Initial load
@@ -22,7 +21,6 @@ let PageScore = (function () {
     }
 
     function destroy() {
-        console.log('destroy page score');
         _ioCommunication.removeAllListeners(socketCommands.updateScore);
     }
 

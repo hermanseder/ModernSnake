@@ -30,7 +30,6 @@ let PageLevels = (function () {
     }
 
     function destroy() {
-        console.log('destroy page levels');
         _removeSocketListener();
         _removeListener();
     }
