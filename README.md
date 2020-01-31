@@ -55,4 +55,4 @@ npm run start
     * [socket.io](https://www.npmjs.com/package/socket.io)
     * [socketio-auth](https://www.npmjs.com/package/socketio-auth)
     * [sqlite3](https://www.npmjs.com/package/sqlite3)
-    * [sqlite3](https://materializecss.com/)
+    * [materializecss](https://materializecss.com/)
