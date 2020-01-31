@@ -364,6 +364,7 @@ async function _sqlDummyDataUserAsync() {
 
 async function _createDummyLevels() {
     await _createDummyLevelBorder();
+    await _createDummyLevelFh();
     // TODO GERI add level
 }
 
@@ -377,8 +378,42 @@ async function _createDummyLevelBorder() {
             walls.push({x: 0, y: i});
             walls.push({x: dimension - 1, y: i});
             walls.push({x: i, y: 0});
-            walls.push({x: i, y: dimension - 1 });
+            walls.push({x: i, y: dimension - 1});
         }
+    }
+
+    await storeLevelAsync(levelName, walls);
+}
+
+async function _createDummyLevelFh() {
+    const levelName = 'FH';
+    const walls = [];
+    const dimension = config.gameDimensions;
+    const halfSize = Math.floor(dimension / 2);
+
+    // F
+    for (let i = 0; i < dimension; i++) {
+        if (i== halfSize) continue;
+        walls.push({x: i, y: 0});
+    }
+    for (let i  = 0; i < halfSize - 5; i++) {
+        if (i== halfSize) continue;
+        walls.push({x: 0, y: i + 1});
+    }
+    for (let i  = 0; i < Math.floor((halfSize - 5) * .9); i++) {
+        if (i== halfSize) continue;
+        walls.push({x: halfSize - 1, y: i + 1});
+    }
+
+    // H
+    for (let i = 0; i < dimension; i++) {
+        if (i== halfSize) continue;
+        walls.push({x: i, y: halfSize + 3});
+        walls.push({x: i, y: dimension - 1});
+    }
+    for (let i  = 0; i < halfSize - 2; i++) {
+        if (i== halfSize) continue;
+        walls.push({x: halfSize - 1, y: halfSize + i + 3});
     }
 
     await storeLevelAsync(levelName, walls);
