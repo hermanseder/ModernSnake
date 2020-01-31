@@ -364,7 +364,53 @@ async function _sqlDummyDataUserAsync() {
 
 async function _createDummyLevels() {
     await _createDummyLevelBorder();
-    // TODO GERI add level
+    await _createDummyLevelSmile(); 
+}
+
+async function _createDummyLevelSmile() {
+    const levelName = 'Smile';
+    const walls = [];
+    const dimension = config.gameDimensions;
+
+    for (let i = 0; i < dimension; i++) {
+        //eyes
+        if (i > 8 && i < 17) {
+            walls.push({x: 10, y: i});
+        }
+        if (i > 21 && i < 30) {
+            walls.push({x: 10, y: i});
+        }
+        //mouth
+        if (i > 12 && i < 19) {
+            walls.push({x: 24, y: i});
+        }
+        if (i > 19 && i < 26) {
+            walls.push({x: 24, y: i});
+        }
+    }
+    //mouth 2nd
+    walls.push({x: 23, y: 12});
+    walls.push({x: 23, y: 26});
+    walls.push({x: 22, y: 11});
+    walls.push({x: 22, y: 27});    
+    //corner left head
+    walls.push({x: 0, y: 0});
+    walls.push({x: 0, y: 1});
+    walls.push({x: 1, y: 0});
+    //corner rigth head
+    walls.push({x: 0, y: 37});
+    walls.push({x: 0, y: 38});
+    walls.push({x: 1, y: 38});
+    //corner left bottom 
+    walls.push({x: 37, y: 0});
+    walls.push({x: 38, y: 1});
+    walls.push({x: 38, y: 0});
+    //corner right bottom
+    walls.push({x: 37, y: 38});
+    walls.push({x: 38, y: 38});
+    walls.push({x: 38, y: 37});
+    //store level in database
+    await storeLevelAsync(levelName, walls);
 }
 
 async function _createDummyLevelBorder() {
