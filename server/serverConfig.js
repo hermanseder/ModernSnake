@@ -1,4 +1,5 @@
 module.exports = {
+    tmpServerFilePath: 'server/data',
     databaseFile: 'server/data/database.db',
 
     saltRounds: 10,

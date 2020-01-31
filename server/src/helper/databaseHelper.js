@@ -19,6 +19,7 @@ const levelNames = ['Border'];
 async function initializeAsync() {
     try {
         const dbExists = _databaseExists();
+        await _checkAndCreateDataFolder();
 
         //create database
         await _openDatabase(config.databaseFile);
@@ -246,6 +247,13 @@ function _databaseExists() {
         return fs.existsSync(config.databaseFile);
     } catch (e) {
         return false;
+    }
+}
+
+function _checkAndCreateDataFolder() {
+    const path = config.tmpServerFilePath;
+    if (!fs.existsSync(path)){
+        fs.mkdirSync(path);
     }
 }
 
