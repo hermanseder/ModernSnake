@@ -35,5 +35,6 @@ npm run start
 👤 **Hermanseder & Rieß**
 
 * Github: 
+[Modern Snake](https://github.com/hermanseder/ModernSnake)
     * [@hermanseder](https://github.com/hermanseder)
     * [@gotome](https://github.com/gotome)
