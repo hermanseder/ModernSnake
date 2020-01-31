@@ -183,11 +183,11 @@ function _getCurrentRoom(size, auth, socketId, callback) {
 
 function _createRoom(auth, roomName, level, difficulty, countPlayers, callback) {
     const escapedRoomName = htmlEscaper.escape(roomName);
-    const escapedlevel = htmlEscaper.escape(level);
+    const escapedLevel = htmlEscaper.escape(level);
     const escapedDifficulty = htmlEscaper.escape(difficulty);
     const escapedCountPlayers = htmlEscaper.escape(countPlayers);
     _callWrapper(auth, callback, () => {
-        serverRoomHandler.createRoom(escapedRoomName, escapedlevel, escapedCountPlayers, Number(escapedDifficulty), callback);
+        serverRoomHandler.createRoom(escapedRoomName, escapedLevel, escapedCountPlayers, Number(escapedDifficulty), callback);
         callback({success: true});
     });
 }
@@ -208,8 +208,9 @@ function _loadScore(auth, callback) {
 }
 
 function _createLevel(auth, levelName, levelData, callback) {
+    const escapedLevelName = htmlEscaper.escape(levelName);
     _callWrapper(auth, callback, () => {
-        serverLevelHandler.saveLevelAsync(levelName, levelData)
+        serverLevelHandler.saveLevelAsync(escapedLevelName, levelData)
             .then((result) => {
                 if (result) {
                     callback({success: true});

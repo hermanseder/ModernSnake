@@ -561,8 +561,9 @@ h1, h2, h3, h4, h5, h6 {
 
 #board {
     top: 1em;
-    width: 50vw;
-    height: 50vw;
+    position: relative;
+    width: 35vw;
+    height: 35vw;
     overflow: hidden;
     border-radius: 12px;
     border: solid;
