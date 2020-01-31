@@ -2,7 +2,7 @@
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000)
 [![License: ISC](https://img.shields.io/badge/License-ISC-yellow.svg)](#)
 
-> Multiplayer version of snake
+> Multiplayer version of snake with level builder and score board.
 
 ### ✨ [Demo (localhost:5000)](localhost:5000)
 
@@ -38,3 +38,21 @@ npm run start
 [Modern Snake](https://github.com/hermanseder/ModernSnake)
     * [@hermanseder](https://github.com/hermanseder)
     * [@gotome](https://github.com/gotome)
+
+## Project information
+### WDP Project of Hermanseder and Rieß
+
+* Project name: ModernSnake
+* Project type: Game
+* Group project: Yes
+* Total time effort: 150h
+* Resources:
+    * [bcrypt](https://www.npmjs.com/package/bcrypt)
+    * [html-escaper](https://www.npmjs.com/package/html-escaper)
+    * [js-sha256](https://www.npmjs.com/package/js-sha256)
+    * [jsonwebtoken](https://www.npmjs.com/search?q=jsonwebtoken)
+    * [node-pre-gyp](https://www.npmjs.com/package/node-pre-gyp)
+    * [socket.io](https://www.npmjs.com/package/socket.io)
+    * [socketio-auth](https://www.npmjs.com/package/socketio-auth)
+    * [sqlite3](https://www.npmjs.com/package/sqlite3)
+    * [sqlite3](https://materializecss.com/)
