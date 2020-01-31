@@ -50,7 +50,7 @@ npm run start
     * [bcrypt](https://www.npmjs.com/package/bcrypt)
     * [html-escaper](https://www.npmjs.com/package/html-escaper)
     * [js-sha256](https://www.npmjs.com/package/js-sha256)
-    * [jsonwebtoken](https://www.npmjs.com/search?q=jsonwebtoken)
+    * [jsonwebtoken](https://www.npmjs.com/package/jsonwebtoken)
     * [node-pre-gyp](https://www.npmjs.com/package/node-pre-gyp)
     * [socket.io](https://www.npmjs.com/package/socket.io)
     * [socketio-auth](https://www.npmjs.com/package/socketio-auth)
