@@ -462,7 +462,7 @@ let GamePlaygroundHandler = (function () {
                 user.empty();
                 if (userPlace) {
                     let html = '';
-                    html += ' <span class="${_classScoreRank}">' + userPlace + '</span>';
+                    html += ' <span class="' + _classScoreRank + '">' + userPlace + '</span>';
                     html += '<span class="' + _classScoreDivider + '">|</span>';
                     html += '<span>' + item.username + '</span>';
                     user.html(html);
