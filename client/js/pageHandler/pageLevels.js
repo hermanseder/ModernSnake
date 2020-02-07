@@ -140,10 +140,10 @@ let PageLevels = (function () {
                 const span = document.createElement('span');
                 const isDisabled = _isDisabledCell(i) || _isDisabledCell(j);
                 span.classList = isDisabled ? 'plot plot-disabled' : 'plot';
-                span.addEventListener('click', () => {
+                span.addEventListener('click', function() {
                     if (!isDisabled) {
                         // NOTE: [...span.classList] simmilar to Array.from(span.classList)
-                        if ([...span.classList].indexOf('plot-active') === -1) {
+                        if (Array.from(span.classList).indexOf('plot-active') === -1) {
                             if (wallCount < ModernSnakeConfig.maxWalls) {
                                 span.classList = 'plot plot-active';
                                 gameState[i][j] = true;

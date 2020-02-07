@@ -44,7 +44,8 @@ const LoginHandler = (function () {
         _logoutDone({success: true}, true);
     }
 
-    function _logoutDone(result, isAutoLogout = false) {
+    function _logoutDone(result, isAutoLogout) {
+        isAutoLogout = isAutoLogout === undefined ? false : isAutoLogout;
         if (!result) return;
         if (result.success) {
             _socketCommunication.disconnect();
@@ -118,7 +119,7 @@ const LoginHandler = (function () {
     }
 
     function _updateMenu() {
-        const newLocation =  window.location.hash.substr(1);
+        const newLocation = window.location.hash.substr(1);
         if (newLocation) {
             PageHandler.updatePath(newLocation);
             ContentHandler.setCurrentMenuItem(newLocation);

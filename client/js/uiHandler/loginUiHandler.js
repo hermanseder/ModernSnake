@@ -32,7 +32,8 @@ let LoginUiHandler = (function () {
         _loginMessage.removeClass('error-message-hidden');
     }
 
-    function loginLogoutSucceeds(username, resetHref = false) {
+    function loginLogoutSucceeds(username, resetHref) {
+        resetHref = resetHref === undefined ? false : resetHref;
         _loggedInUser.text(username || 'Login');
         _currentUser.text(username || 'Login');
         _updateLoginStates();

@@ -64,7 +64,8 @@ let GamePlaygroundHandler = (function () {
         _resizeCanvas();
     }
 
-    function stopGame(sendEvent = true) {
+    function stopGame(sendEvent) {
+        sendEvent = sendEvent === undefined ? true : sendEvent;
         if (sendEvent) _ioCommunication.emit(socketCommands.leaveRoom, LoginHandler.getAuth());
         _removeListener();
         _currentGameData = undefined;
@@ -460,13 +461,13 @@ let GamePlaygroundHandler = (function () {
                 const userPlace = _getPlace(placeData, userName);
                 user.empty();
                 if (userPlace) {
-                    user.html(`
-                        <span class="${_classScoreRank}">${userPlace}</span>
-                        <span class="${_classScoreDivider}">|</span>
-                        <span>${item.username}</span>
-                    `);
+                    let html = '';
+                    html += ' <span class="${_classScoreRank}">' + userPlace + '</span>';
+                    html += '<span class="' + _classScoreDivider + '">|</span>';
+                    html += '<span>' + item.username + '</span>';
+                    user.html(html);
                 } else {
-                    user.html(`<span>${item.username}</span>`);
+                    user.html('<span>'  + item.username + '</span>');
                 }
             }
         }
@@ -475,7 +476,8 @@ let GamePlaygroundHandler = (function () {
     function _getPlace(placeData, username) {
         if (!placeData) return undefined;
         if (!username) return undefined;
-        for (const place of placeData) {
+        for (let i = 0; i < placeData.length; i++) {
+            const place = placeData[i];
             if (place.username === username) return place.rank;
         }
         return undefined;

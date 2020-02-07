@@ -132,7 +132,7 @@ let GameModeSelectorHandler = (function () {
             return;
         }
 
-        _currentRoomData = [...data];
+        _currentRoomData = Array.from(data);
         const elements = _roomSelectionContent.find('.' + _roomSelectionRowClass);
         for (let i = 0; i < elements.length; i++) {
             const currentElement = $(elements.get(i));
